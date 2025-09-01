@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "2.2.0"
     id("fabric-loom") version "1.11-SNAPSHOT"
+    kotlin("plugin.serialization") version "2.2.0"
     id("maven-publish")
 }
 
@@ -23,6 +24,13 @@ java {
     withSourcesJar()
 }
 
+// Ensure Kotlin uses JDK 21 toolchain and JVM target
+kotlin {
+    jvmToolchain(21)
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_21)
+    }
+}
 
 
 repositories {
@@ -65,10 +73,11 @@ dependencies {
     modImplementation("net.fabricmc:fabric-language-kotlin:${project.property("kotlin_loader_version")}")
 
     modImplementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_version")}")
-    include(modImplementation("com.noxcrew.sheeplib:api:1.4.1+1.21.8")!!)
+    include(modImplementation("com.noxcrew.sheeplib:api:1.4.2+1.21.8")!!)
     modImplementation("dev.isxander:yet-another-config-lib:${project.property("yacl_version")}")
     modImplementation("com.terraformersmc:modmenu:${project.property("modmenu_version")}")
     modImplementation("com.noxcrew.noxesium:fabric:2.7.7")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
 }
 
 loom {
@@ -84,10 +93,12 @@ tasks.processResources {
     filteringCharset = "UTF-8"
 
     filesMatching("fabric.mod.json") {
-        expand("version" to project.version,
-            "minecraft_version" to project.property("minecraft_version"),
-            "loader_version" to project.property("loader_version"),
-            "kotlin_loader_version" to project.property("kotlin_loader_version"))
+        expand(
+            "version" to project.version.toString(),
+            "minecraft_version" to (project.property("minecraft_version") as String),
+            "loader_version" to (project.property("loader_version") as String),
+            "kotlin_loader_version" to (project.property("kotlin_loader_version") as String)
+        )
     }
 }
 
@@ -101,7 +112,7 @@ tasks.withType<JavaCompile>().configureEach {
 }
 
 tasks.withType<KotlinCompile>().configureEach {
-    compilerOptions.jvmTarget.set(JvmTarget.fromTarget(targetJavaVersion.toString()))
+    compilerOptions.jvmTarget.set(JvmTarget.JVM_21)
 }
 
 tasks.jar {

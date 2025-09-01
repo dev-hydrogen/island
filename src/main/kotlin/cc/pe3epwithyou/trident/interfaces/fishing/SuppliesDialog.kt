@@ -109,7 +109,7 @@ class SuppliesDialog(x: Int, y: Int, key: String) : TridentDialog(x, y, key), Th
             .append(
                 Component.literal(" $baitAmount")
                     .mccFont()
-                    .withColor(if (isBaitDesynced) ChatFormatting.GOLD.color!! else ChatFormatting.WHITE.color!!)
+                    .withColor(if (isBaitDesynced) ChatFormatting.GOLD.color!! else supplies.bait.type.color)
             )
         StringWidget(baitComponent, mcFont)
             .at(0, 0, settings = LayoutConstants.LEFT)
@@ -132,7 +132,7 @@ class SuppliesDialog(x: Int, y: Int, key: String) : TridentDialog(x, y, key), Th
         val lineComponent = Component.literal(lineIcon)
             .withTridentFont()
             .append(Component.empty().withStyle(ChatFormatting.RESET))
-            .append(Component.literal(" $lineDurability/50").mccFont())
+            .append(Component.literal(" $lineDurability/50").mccFont().withColor(supplies.line.type.color))
         StringWidget(lineComponent, mcFont)
             .at(0, 1, settings = LayoutConstants.LEFT)
             .apply {
@@ -179,11 +179,6 @@ class SuppliesDialog(x: Int, y: Int, key: String) : TridentDialog(x, y, key), Th
         ).atBottom(0, 2, settings = LayoutConstants.LEFT)
 
         val augmentLine = supplies.augments.toMutableList()
-        if (augmentLine.size < supplies.augmentsAvailable) {
-            for (i in 1..(supplies.augmentsAvailable - augmentLine.size)) {
-                augmentLine.add(Augment.EMPTY_AUGMENT)
-            }
-        }
         if (augmentLine.isEmpty()) {
             StringWidget(
                 Component.literal("AUGMENTS UNAVAILABLE")
@@ -199,6 +194,9 @@ class SuppliesDialog(x: Int, y: Int, key: String) : TridentDialog(x, y, key), Th
             ).atBottom(0, 2, LayoutConstants.LEFT)
         }
 
+        // Footnote
+        StringWidget(Component.literal("Module Credit: pe3ep, Hydrogen").mccFont().withStyle(ChatFormatting.GRAY), mcFont)
+            .atBottom(0, 3, LayoutConstants.LEFT)
     }
 
     override fun refresh() {
