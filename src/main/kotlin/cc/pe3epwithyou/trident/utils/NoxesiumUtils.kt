@@ -54,31 +54,31 @@ object NoxesiumUtils {
             val k = "supplies"
             DialogCollection.open(k, SuppliesDialog(10, 10, k))
         }
-        if (currentGame == Game.FISHING) {
+        if (currentGame == Game.FISHING && Config.Fishing.spotModule) {
             val k = "spot"
             DialogCollection.open(k, SpotDialog(10, 10, k))
         }
-        if (currentGame == Game.FISHING) {
+        if (currentGame == Game.FISHING && Config.Fishing.upgradesModule) {
             val k = "upgrades"
             DialogCollection.open(k, UpgradesDialog(10, 20, k))
         }
-        if (currentGame == Game.FISHING) {
+        if (currentGame == Game.FISHING && Config.Fishing.hookChancesModule) {
             val k = "hookchances"
             DialogCollection.open(k, HookChanceDialog(10, 30, k))
         }
-        if (currentGame == Game.FISHING) {
+        if (currentGame == Game.FISHING && Config.Fishing.magnetChancesModule) {
             val k = "magnetchances"
             DialogCollection.open(k, MagnetChanceDialog(10, 30, k))
         }
-        if (currentGame == Game.FISHING) {
+        if (currentGame == Game.FISHING && Config.Fishing.rodChancesModule) {
             val k = "rodchances"
             DialogCollection.open(k, RodChanceDialog(10, 30, k))
         }
-        if (currentGame == Game.FISHING) {
+        if (currentGame == Game.FISHING && Config.Fishing.potChancesModule) {
             val k = "potchances"
             DialogCollection.open(k, PotChanceDialog(10, 30, k))
         }
-        if (currentGame == Game.FISHING) {
+        if (currentGame == Game.FISHING && Config.Fishing.chancePerksModule) {
             val k = "chanceperks"
             DialogCollection.open(k, ChancePerksDialog(10, 30, k))
         }

@@ -33,7 +33,28 @@ class Config {
     var raritySlotDisplayType: DisplayType = DisplayType.OUTLINE
 
     @SerialEntry
+    var fishingUpgradesModule: Boolean = true
+
+    @SerialEntry
+    var fishingSpotModule: Boolean = true
+
+    @SerialEntry
     var fishingSuppliesModule: Boolean = true
+
+    @SerialEntry
+    var fishingHookChancesModule: Boolean = true
+
+    @SerialEntry
+    var fishingMagnetChancesModule: Boolean = true
+
+    @SerialEntry
+    var fishingRodChancesModule: Boolean = true
+
+    @SerialEntry
+    var fishingPotChancesModule: Boolean = true
+
+    @SerialEntry
+    var fishingChancePerksModule: Boolean = true
 
     @SerialEntry
     var fishingWayfinderModule: Boolean = true
@@ -127,6 +148,20 @@ class Config {
     object Fishing {
         val suppliesModule: Boolean
             get() = handler.instance().fishingSuppliesModule
+        val upgradesModule: Boolean
+            get() = handler.instance().fishingUpgradesModule
+        val spotModule: Boolean
+            get() = handler.instance().fishingSpotModule
+        val hookChancesModule: Boolean
+            get() = handler.instance().fishingHookChancesModule
+        val magnetChancesModule: Boolean
+            get() = handler.instance().fishingMagnetChancesModule
+        val rodChancesModule: Boolean
+            get() = handler.instance().fishingRodChancesModule
+        val potChancesModule: Boolean
+            get() = handler.instance().fishingPotChancesModule
+        val chancePerksModule: Boolean
+            get() = handler.instance().fishingChancePerksModule
         val wayfinderModule: Boolean
             get() = handler.instance().fishingWayfinderModule
         val flashIfDepleted: Boolean
@@ -430,21 +465,118 @@ class Config {
                         controller(tickBox())
                     }
 
+                    options.register<Boolean>("upgrades_module") {
+                        name(Component.translatable("config.trident.fishing.upgrades_module.name"))
+                        description(
+                            OptionDescription.createBuilder()
+                                .text(Component.translatable("config.trident.fishing.upgrades_module.description"))
+                                .image(
+                                    ResourceLocation.fromNamespaceAndPath("trident", "textures/config/upgrades_module.png"),
+                                    598,
+                                    234
+                                ).build()
+                        )
+                        binding(handler.instance()::fishingUpgradesModule, true)
+                        controller(tickBox())
+                    }
+
+                    options.register<Boolean>("spot_module") {
+                        name(Component.translatable("config.trident.fishing.spot_module.name"))
+                        description(
+                            OptionDescription.createBuilder()
+                                .text(Component.translatable("config.trident.fishing.spot_module.description"))
+                                .image(
+                                    ResourceLocation.fromNamespaceAndPath("trident", "textures/config/spot_module.png"),
+                                    367,
+                                    225
+                                ).build()
+                        )
+                        binding(handler.instance()::fishingSpotModule, true)
+                        controller(tickBox())
+                    }
+
+                    options.register<Boolean>("hook_chances_module") {
+                        name(Component.translatable("config.trident.fishing.hook_chances_module.name"))
+                        description(
+                            OptionDescription.createBuilder()
+                                .text(Component.translatable("config.trident.fishing.hook_chances_module.description"))
+                                .image(
+                                    ResourceLocation.fromNamespaceAndPath("trident", "textures/config/hook_module.png"),
+                                    440,
+                                    287
+                                ).build()
+                        )
+                        binding(handler.instance()::fishingHookChancesModule, true)
+                        controller(tickBox())
+                    }
+
+                    options.register<Boolean>("magnet_chances_module") {
+                        name(Component.translatable("config.trident.fishing.magnet_chances_module.name"))
+                        description(
+                            OptionDescription.createBuilder()
+                                .text(Component.translatable("config.trident.fishing.magnet_chances_module.description"))
+                                .image(
+                                    ResourceLocation.fromNamespaceAndPath("trident", "textures/config/magnet_module.png"),
+                                    485,
+                                    292
+                                ).build()
+                        )
+                        binding(handler.instance()::fishingMagnetChancesModule, true)
+                        controller(tickBox())
+                    }
+
+                    options.register<Boolean>("rod_chances_module") {
+                        name(Component.translatable("config.trident.fishing.rod_chances_module.name"))
+                        description(
+                            OptionDescription.createBuilder()
+                                .text(Component.translatable("config.trident.fishing.rod_chances_module.description"))
+                                .image(
+                                    ResourceLocation.fromNamespaceAndPath("trident", "textures/config/rod_module.png"),
+                                    323,
+                                    268
+                                ).build()
+                        )
+                        binding(handler.instance()::fishingRodChancesModule, true)
+                        controller(tickBox())
+                    }
+
+                    /*options.register<Boolean>("pot_chances_module") {
+                        name(Component.translatable("config.trident.fishing.pot_chances_module.name"))
+                        description(OptionDescription.of(Component.translatable("config.trident.fishing.pot_chances_module.description")))
+                        binding(handler.instance()::fishingPotChancesModule, true)
+                        controller(tickBox())
+                    }*/
+
+                    options.register<Boolean>("chance_perks_module") {
+                        name(Component.translatable("config.trident.fishing.chance_perks_module.name"))
+                        description(
+                            OptionDescription.createBuilder()
+                                .text(Component.translatable("config.trident.fishing.chance_perks_module.description"))
+                                .image(
+                                    ResourceLocation.fromNamespaceAndPath("trident", "textures/config/chance_module.png"),
+                                    507,
+                                    333
+                                ).build()
+                        )
+                        binding(handler.instance()::fishingChancePerksModule, true)
+                        controller(tickBox())
+                    }
+
                     options.register<Boolean>("flash_if_depleted") {
                         name(Component.translatable("config.trident.fishing.flash_if_depleted.name"))
                         description(OptionDescription.of(Component.translatable("config.trident.fishing.flash_if_depleted.description")))
                         binding(handler.instance()::fishingFlashIfDepleted, true)
                         controller(tickBox())
                     }
-//                    options.register<Boolean>("wayfinder_module") {
-//                        name(Component.translatable("config.trident.fishing.wayfinder_module.name"))
-//                        description(OptionDescription.createBuilder()
-//                            .text(Component.translatable("config.trident.fishing.wayfinder_module.description"))
-//                            .build()
-//                        )
-//                        binding(handler.instance()::fishingWayfinderModule, true)
-//                        controller(tickBox())
-//                    }
+                    /*options.register<Boolean>("wayfinder_module") {
+                        name(Component.translatable("config.trident.fishing.wayfinder_module.name"))
+                        description(OptionDescription.createBuilder()
+                            .text(Component.translatable("config.trident.fishing.wayfinder_module.description"))
+                            .build()
+                        )
+                        binding(handler.instance()::fishingWayfinderModule, true)
+                        controller(tickBox())
+                    }*/
                 }
             }
 
