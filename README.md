@@ -16,6 +16,8 @@ Client-side utility mod for [MCC Island](https://mcchampionship.com/island/). Fo
 
 Each row shows the Base view (left) and the Expanded view (right) of a module.
 
+All the modules calculations are affected by your current spot, tides, upgrades, augments, supplies, and anything else that should affect them. 
+
 <table>
   <thead>
     <tr>
@@ -26,15 +28,15 @@ Each row shows the Base view (left) and the Expanded view (right) of a module.
   <tbody>
     <tr>
       <td align="center"><img alt="Module base view 1" src="https://github.com/user-attachments/assets/868e755a-1366-416e-bb23-b251b7fdea05" width="100%" /><br/><sub>Base view — compact overview</sub></td>
-      <td align="center"><img alt="Module expanded view 1" src="https://github.com/user-attachments/assets/34256229-281e-4d9f-ba0f-b747ce6c446c" width="100%" /><br/><sub>Expanded view — Shows calculations, affected by your current spot, tides, upgrades, augments, and everything else.</sub></td>
+      <td align="center"><img alt="Module expanded view 1" src="https://github.com/user-attachments/assets/34256229-281e-4d9f-ba0f-b747ce6c446c" width="100%" /><br/><sub>Expanded view — Shows calculations.</sub></td>
     </tr>
     <tr>
       <td align="center"><img alt="Module base view 2" src="https://github.com/user-attachments/assets/b3966547-7649-409f-a519-50a93ece8e91" width="100%" /><br/><sub>Base view — compact overview</sub></td>
-      <td align="center"><img alt="Module expanded view 2" src="https://github.com/user-attachments/assets/35fa9c45-6ba0-4615-bcf6-540a28b7dcc1" width="100%" /><br/><sub>Expanded view — Shows calculations, affected by your current spot, tides, upgrades, augments, and everything else. Also shows your guaranteed multiplier, and the % chance to get 1 more</sub></td>
+      <td align="center"><img alt="Module expanded view 2" src="https://github.com/user-attachments/assets/35fa9c45-6ba0-4615-bcf6-540a28b7dcc1" width="100%" /><br/><sub>Expanded view — Shows calculations, and the % chance to get 1 more</sub></td>
     </tr>
     <tr>
       <td align="center"><img alt="Module base view 3" src="https://github.com/user-attachments/assets/ad012764-01fb-415e-9b1b-744b668fab3c" width="100%" /><br/><sub>Base view — compact overview</sub></td>
-      <td align="center"><img alt="Module expanded view 3" src="https://github.com/user-attachments/assets/cd140e0d-724d-4fd9-bc72-c9bb5f91b3be" width="100%" /><br/><sub>Expanded view — Shows calculations, affected by your current spot, tides, upgrades, augments, and everything else. Also works in grotto spots!</sub></td>
+      <td align="center"><img alt="Module expanded view 3" src="https://github.com/user-attachments/assets/cd140e0d-724d-4fd9-bc72-c9bb5f91b3be" width="100%" /><br/><sub>Expanded view — Shows calculations. Also works in grotto spots!</sub></td>
     </tr>
   </tbody>
   <tfoot>
