@@ -82,7 +82,7 @@ dependencies {
 
 loom {
     mixin {
-        defaultRefmapName.set("trident.refmap.json")
+        defaultRefmapName.set("islandplusplus.refmap.json")
     }
 }
 

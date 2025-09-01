@@ -148,10 +148,6 @@ class UpgradesDialog(x: Int, y: Int, key: String) : TridentDialog(x, y, key), Th
                     .at(row, (c + 1) * 2, settings = LayoutConstants.CENTRE)
             }
         }
-
-        // Footnote
-        StringWidget(Component.literal("Module Credit: Hydrogen").mccFont().withStyle(ChatFormatting.GRAY), mcFont)
-            .at(UpgradeLine.entries.size + 2, 0, settings = LayoutConstants.LEFT)
     }
 
     override fun refresh() {

@@ -273,10 +273,6 @@ class HookChanceDialog(x: Int, y: Int, key: String) : TridentDialog(x, y, key), 
             // extra spacing row between types
             row++
         }
-
-        // Footnote
-        StringWidget(Component.literal("Module Credit: Hydrogen").mccFont().withStyle(ChatFormatting.GRAY), font)
-            .atBottom(0, settings = LayoutConstants.LEFT)
     }
 
     override fun refresh() {

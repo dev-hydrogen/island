@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "id": "trident",
+  "id": "island++",
   "version": "${version}",
 
-  "name": "Trident",
+  "name": "Island++",
   "description": "Client-side utility mod for MCC Island, providing a huge range of utility and quality of life features.",
-  "authors": ["Pe3ep", "SirArchibald97"],
+  "authors": ["Hydrogen","Pe3ep", "SirArchibald97"],
   "contact": {
-    "issues": "https://github.com/pe3ep/Trident/issues",
-    "sources": "https://github.com/pe3ep/Trident"
+    "issues": "https://github.com/dev-hydrogen/island/issues",
+    "sources": "https://github.com/dev-hydrogen/island"
   },
   
   "license": "LGPL-3.0",
@@ -28,7 +28,7 @@
   "custom": {
     "modmenu": {
       "links": {
-        "modmenu.discord": "https://discord.gg/qVRpEWdGvh"
+        "modmenu.discord": "https://discord.gg/EyvNtSKbT6"
       },
       "update_checker": true
     }

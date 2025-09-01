@@ -45,9 +45,7 @@ class PotChanceDialog(x: Int, y: Int, key: String) : TridentDialog(x, y, key), T
         MultiLineTextWidget(Component.literal("POTS: TODO").mccFont().withStyle(ChatFormatting.GRAY), font)
             .at(row++, 0, settings = LayoutConstants.LEFT)
 
-        // Footnote
-        StringWidget(Component.literal("Module Credit: Hydrogen").mccFont().withStyle(ChatFormatting.GRAY), font)
-            .atBottom(0, settings = LayoutConstants.LEFT)
+
     }
 
     override fun refresh() {
