@@ -47,7 +47,7 @@ Each row shows the Base view (left) and the Expanded view (right) of a module.
 <p align="center">
   <img alt="Additional module view" src="https://github.com/user-attachments/assets/3b1103f7-2000-4509-abed-8c6bddb42438" width="70%" />
   <br/>
-  <sub>Additional composite view.</sub>
+  <sub>Rod chances also included</sub>
   
 </p>
 
