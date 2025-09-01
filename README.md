@@ -53,56 +53,112 @@ Each row shows the Base view (left) and the Expanded view (right) of a module.
 
 ### Upgraded Supplies module
 
-<img width="478" height="311" alt="NVIDIA_Overlay_gxwr5IceLb" src="https://github.com/user-attachments/assets/e42b340c-80c6-464e-a1ef-4f65a583b16a" />
-
-Displays more information about your supplies, augments, and overclocks. Displays OC levels, Augment Uses (Max and Uses Left)
+<table>
+  <caption><strong>Upgraded Supplies module</strong></caption>
+  <tbody>
+    <tr>
+      <td align="center" width="60%">
+        <img alt="Upgraded Supplies module" src="https://github.com/user-attachments/assets/e42b340c-80c6-464e-a1ef-4f65a583b16a" width="100%" />
+      </td>
+      <td width="40%">
+        <ul>
+          <li>Shows supplies, augments, and overclocks</li>
+          <li>Displays OC levels</li>
+          <li>Augment uses: max and remaining</li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 ### Upgrades module
 
-<img width="598" height="234" alt="NVIDIA_Overlay_fBGlz6SnZg" src="https://github.com/user-attachments/assets/3054d3da-4d5d-469b-9fd4-f0436ade2fab" />
-
-Displays your current upgrade status
+<table>
+  <caption><strong>Upgrades module</strong></caption>
+  <tbody>
+    <tr>
+      <td align="center" width="60%">
+        <img alt="Upgrades module" src="https://github.com/user-attachments/assets/3054d3da-4d5d-469b-9fd4-f0436ade2fab" width="100%" />
+      </td>
+      <td width="40%">
+        <ul>
+          <li>Summarizes your current upgrade status</li>
+          <li>Quick at-a-glance progress</li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 ### Spot module
 
-<img width="367" height="225" alt="NVIDIA_Overlay_4RPTCVPzuW" src="https://github.com/user-attachments/assets/87d6bb29-ac53-4c6f-927a-8c8556c77ac6" />
-
-Displays all the buffs from the current spot
+<table>
+  <caption><strong>Spot module</strong></caption>
+  <tbody>
+    <tr>
+      <td align="center" width="60%">
+        <img alt="Spot module" src="https://github.com/user-attachments/assets/87d6bb29-ac53-4c6f-927a-8c8556c77ac6" width="100%" />
+      </td>
+      <td width="40%">
+        <ul>
+          <li>Displays all buffs from the current spot</li>
+          <li>Understand context-specific bonuses quickly</li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 
 ## Base Trident Features
 
-### Rarity overlay
-Displays an outline behind the item in the color of it's rarity
+<table>
+  <caption><strong>Base Trident Features</strong></caption>
+  <thead>
+    <tr>
+      <th align="left">Feature</th>
+      <th align="center">Preview</th>
+      <th align="left">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Rarity overlay</strong></td>
+      <td align="center">—</td>
+      <td>Displays an outline behind the item in the color of its rarity</td>
+    </tr>
+    <tr>
+      <td><strong>Blueprint indicators</strong></td>
+      <td align="center"><img alt="Blueprint indicators" src="https://cdn.modrinth.com/data/cached_images/5cf23263586928c33fc938b77ae733ddf2ab0731.png" width="100%" /></td>
+      <td>
+        Displays icons based on blueprint ownership status.<br/>
+        Tick icon — Blueprint has maxed royal donations.<br/>
+        Diamond icon — Blueprint is not owned by player.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Focus game on countdown</strong></td>
+      <td align="center">—</td>
+      <td>Puts Minecraft in front when your game is about to start</td>
+    </tr>
+    <tr>
+      <td><strong>Kill Feed</strong></td>
+      <td align="center"><img alt="Kill feed" src="https://cdn.modrinth.com/data/cached_images/7f9a0186174f124c7e944250b7eae64ab8a93c82.png" width="100%" /></td>
+      <td>Adds a Kill Feed similar to Counter‑Strike and Valorant for Battle Box and Dynaball</td>
+    </tr>
+    <tr>
+      <td><strong>Questing Module</strong></td>
+      <td align="center"><img alt="Questing widget" src="https://cdn.modrinth.com/data/cached_images/7452f924368eab780a33f697e74aec2194438ddf.png" width="100%" /></td>
+      <td>Adds a Questing Module widget with <em>live‑updating</em> progress</td>
+    </tr>
+    <tr>
+      <td><strong>Fishing Supplies Module</strong></td>
+      <td align="center"><img alt="Supplies module" src="https://cdn.modrinth.com/data/cached_images/f9b49d912cd8016d88c0a8aff634838791cbcfdd.png" width="100%" /></td>
+      <td>Shows Bait, line durability, active Overclocks, and equipped Augments in Fishtances</td>
+    </tr>
+  </tbody>
+</table>
 
-### Blueprint indicators
-![Blueprint indicators](https://cdn.modrinth.com/data/cached_images/5cf23263586928c33fc938b77ae733ddf2ab0731.png)
-
-Displays icons based on blueprint's ownership status.
-
-Tick Icon - Blueprint has maxed royal donations
-
-Diamond icon - Blueprint is not owned by player
-
-### Focus game on countdown
-Puts Minecraft in front when your game is about to start
-
-### Kill Feed
-![Kill feed](https://cdn.modrinth.com/data/cached_images/7f9a0186174f124c7e944250b7eae64ab8a93c82.png)
-
-Adds a Kill Feed similar to games like Counter Strike and Valorant for Battle Box and Dynaball
-
-### Questing Module
-![Questing widget](https://cdn.modrinth.com/data/cached_images/7452f924368eab780a33f697e74aec2194438ddf.png)
-
-Adds a Questing Module widget to be shown in games with **live-updating progress**
-
-### Fishing Supplies Module
-![Supplies module](https://cdn.modrinth.com/data/cached_images/f9b49d912cd8016d88c0a8aff634838791cbcfdd.png)
-
-Adds a Supplies Module widget to be shown in Fishtances where you can see your Bait, Line duarbility, Active Overclocks and Equipped Augments
-
-### And many more!
-You can see an up to date list of features in the mod's config!
+<p><em>And many more! You can see an up‑to‑date list of features in the mod's config.</em></p>
 
 *Not affiliated and endorsed by Noxcrew or Mojang AB*
