@@ -9,20 +9,47 @@ Client-side utility mod for [MCC Island](https://mcchampionship.com/island/). Fo
 - [Fabric Language Kotlin](https://modrinth.com/mod/fabric-language-kotlin)
 - [Noxesium](https://modrinth.com/mod/noxesium)
 
-# Island++ Features
+## Island++ Features
 
 ### Hook, Magnet, Rod Chances & Chance perks modules
 
-<img width="440" height="287" alt="NVIDIA_Overlay_qUlCXaILDi" src="https://github.com/user-attachments/assets/868e755a-1366-416e-bb23-b251b7fdea05" />
-<img width="650" height="648" alt="NVIDIA_Overlay_qa6LbxL2P7" src="https://github.com/user-attachments/assets/34256229-281e-4d9f-ba0f-b747ce6c446c" />
+Each row shows the Base view (left) and the Expanded view (right) of a module.
 
-<img width="485" height="292" alt="NVIDIA_Overlay_5cdBDoxA9G" src="https://github.com/user-attachments/assets/b3966547-7649-409f-a519-50a93ece8e91" />
-<img width="518" height="548" alt="NVIDIA_Overlay_cKSQWWDm1J" src="https://github.com/user-attachments/assets/35fa9c45-6ba0-4615-bcf6-540a28b7dcc1" />
+<table>
+  <thead>
+    <tr>
+      <th align="center">Base</th>
+      <th align="center">Expanded</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td align="center"><img alt="Module base view 1" src="https://github.com/user-attachments/assets/868e755a-1366-416e-bb23-b251b7fdea05" width="100%" /></td>
+      <td align="center"><img alt="Module expanded view 1" src="https://github.com/user-attachments/assets/34256229-281e-4d9f-ba0f-b747ce6c446c" width="100%" /></td>
+    </tr>
+    <tr>
+      <td align="center"><img alt="Module base view 2" src="https://github.com/user-attachments/assets/b3966547-7649-409f-a519-50a93ece8e91" width="100%" /></td>
+      <td align="center"><img alt="Module expanded view 2" src="https://github.com/user-attachments/assets/35fa9c45-6ba0-4615-bcf6-540a28b7dcc1" width="100%" /></td>
+    </tr>
+    <tr>
+      <td align="center"><img alt="Module base view 3" src="https://github.com/user-attachments/assets/ad012764-01fb-415e-9b1b-744b668fab3c" width="100%" /></td>
+      <td align="center"><img alt="Module expanded view 3" src="https://github.com/user-attachments/assets/cd140e0d-724d-4fd9-bc72-c9bb5f91b3be" width="100%" /></td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="2" align="center"><sub>Use the expanded view to see detailed breakdowns and perk effects at a glance.</sub></td>
+    </tr>
+  </tfoot>
+  
+</table>
 
-<img width="526" height="297" alt="NVIDIA_Overlay_4zEKrvToMe" src="https://github.com/user-attachments/assets/ad012764-01fb-415e-9b1b-744b668fab3c" />
-<img width="539" height="454" alt="NVIDIA_Overlay_GS5j9j0KYq" src="https://github.com/user-attachments/assets/cd140e0d-724d-4fd9-bc72-c9bb5f91b3be" />
-
-<img width="323" height="268" alt="NVIDIA_Overlay_8RUoibcrlA" src="https://github.com/user-attachments/assets/3b1103f7-2000-4509-abed-8c6bddb42438" />
+<p align="center">
+  <img alt="Additional module view" src="https://github.com/user-attachments/assets/3b1103f7-2000-4509-abed-8c6bddb42438" width="70%" />
+  <br/>
+  <sub>Additional composite view.</sub>
+  
+</p>
 
 ### Upgraded Supplies module
 
@@ -43,7 +70,7 @@ Displays your current upgrade status
 Displays all the buffs from the current spot
 
 
-# Base Trident Features
+## Base Trident Features
 
 ### Rarity overlay
 Displays an outline behind the item in the color of it's rarity
