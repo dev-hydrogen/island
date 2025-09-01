@@ -1,9 +1,7 @@
 
-<img src="https://cdn.modrinth.com/data/L6RCcsrd/889ddfba0725009a0285e6ec885f499923ac7414.png" alt="Trident Logo" width="96" height="96">
-
-Trident
+Island++
 ---
-Client-side utility mod for [MCC Island](https://mcchampionship.com/island/), providing a huge range of utility and quality of life features.
+Client-side utility mod for [MCC Island](https://mcchampionship.com/island/). Fork of [Trident](https://github.com/pe3ep/Trident) adding a lot of extra features and additions, especially to fishing
 
 ## Requirements
 - Minecraft 1.21.8
@@ -11,7 +9,26 @@ Client-side utility mod for [MCC Island](https://mcchampionship.com/island/), pr
 - [Fabric Language Kotlin](https://modrinth.com/mod/fabric-language-kotlin)
 - [Noxesium](https://modrinth.com/mod/noxesium)
 
-# Features
+# Island++ Features
+
+### Hook, Magnet, Rod Chances & Chance perks modules
+
+TODO
+
+### Upgraded Supplies module
+
+Displays more information about your supplies, augments, and overclocks. Displays OC levels, Augment Uses (Max and Uses Left)
+
+### Upgrades module
+
+Displays your current upgrade status
+
+### Spot module
+
+Displays all the buffs from the current spot
+
+
+# Base Trident Features
 
 ### Rarity overlay
 Displays an outline behind the item in the color of it's rarity
