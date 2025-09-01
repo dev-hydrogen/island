@@ -3,6 +3,8 @@ Island++
 ---
 Client-side utility mod for [MCC Island](https://mcchampionship.com/island/). Fork of [Trident](https://github.com/pe3ep/Trident) adding a lot of extra features and additions, especially to fishing
 
+Join the discord! [https://discord.gg/EyvNtSKbT6](https://discord.gg/EyvNtSKbT6)
+
 ## Requirements
 - Minecraft 1.21.8
 - Fabric
