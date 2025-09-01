@@ -5,6 +5,7 @@ Client-side utility mod for [MCC Island](https://mcchampionship.com/island/). Fo
 
 ## Requirements
 - Minecraft 1.21.8
+- Fabric
 - [Yet Another Config Lib](https://modrinth.com/mod/yacl)
 - [Fabric Language Kotlin](https://modrinth.com/mod/fabric-language-kotlin)
 - [Noxesium](https://modrinth.com/mod/noxesium)
