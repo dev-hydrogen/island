@@ -1,7 +1,7 @@
 
 Island++
 ---
-Client-side utility mod for [MCC Island](https://mcchampionship.com/island/). Fork of [Trident](https://github.com/pe3ep/Trident) adding a lot of extra features and additions, especially to fishing
+Client-side utility mod for [MCC Island](https://mcchampionship.com/island/). Fork of [Trident](https://github.com/pe3ep/Trident) adding a lot of extra features and additions, especially to fishing. **DO NOT USE ALONGSIDE TRIDENT, they will clash**
 
 Join the discord! [https://discord.gg/EyvNtSKbT6](https://discord.gg/EyvNtSKbT6)
 
