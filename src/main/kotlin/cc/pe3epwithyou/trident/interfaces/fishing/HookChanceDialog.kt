@@ -78,43 +78,68 @@ class HookChanceDialog(x: Int, y: Int, key: String) : TridentDialog(x, y, key), 
     }
 
     private fun applyMultiplier(line: UpgradeLine, base: List<Cat>, targets: Set<String>, mult: Double): List<Cat> {
-        if (mult == 1.0 || base.isEmpty()) return base
-        // Rarity Rod augment: Guarantees Uncommon+ and triples Legendary/Mythic for Wise hook
-        val augments = TridentClient.playerState.supplies.augments.map { it.augment }
-        if (line == UpgradeLine.WISE && augments.any { it == Augment.RARITY_ROD }) {
-            val map = base.associate { it.name to it.pct }.toMutableMap()
-            // Triple Legendary/Mythic; take from Common first, then Rare if needed, then proportionally from remaining non-targets, add remainder to Uncommon
-            val legendaryNames = setOf("Legendary", "Mythic")
-            val tripleTargets = base.filter { it.name in legendaryNames }
-            val increase = tripleTargets.sumOf { it.pct * 2.0 }
-            var remainingRemoval = increase
-            // remove from Common
-            val commonBase = map["Common"] ?: 0.0
-            val takeCommon = kotlin.math.min(commonBase, remainingRemoval)
-            map["Common"] = commonBase - takeCommon
-            remainingRemoval -= takeCommon
-            if (remainingRemoval > 1e-9) {
-                val rareBase = map["Rare"] ?: 0.0
-                val takeRare = kotlin.math.min(rareBase, remainingRemoval)
-                map["Rare"] = rareBase - takeRare
-                remainingRemoval -= takeRare
+        if (base.isEmpty()) return base
+        val hasActiveRarityRod = TridentClient.playerState.supplies.augments
+            .any { it.augment == Augment.RARITY_ROD && !it.paused && ((it.usesCurrent ?: 0) > 0) }
+
+        fun finalizeWithRarityRod(list: List<Cat>): List<Cat> {
+            if (!(line == UpgradeLine.WISE && hasActiveRarityRod)) return list
+            val order = list.map { it.name }
+            val map = list.associate { it.name to it.pct }.toMutableMap()
+
+            // Guarantee Uncommon+: zero Common, share its mass between Uncommon and Epic proportionally
+            val common = map["Common"] ?: 0.0
+            map["Common"] = 0.0
+            val un = map["Uncommon"] ?: 0.0
+            val ep = map["Epic"] ?: 0.0
+            val ueSum = un + ep
+            if (ueSum > 0.0) {
+                map["Uncommon"] = un + common * (un / ueSum)
+                map["Epic"] = ep + common * (ep / ueSum)
+            } else {
+                map["Uncommon"] = un + common
             }
-            if (remainingRemoval > 1e-9) {
-                val others = listOf("Uncommon", "Epic").associateWith { map[it] ?: 0.0 }
-                val sum = others.values.sum()
-                if (sum > 0) {
-                    val scale = (sum - remainingRemoval).coerceAtLeast(0.0) / sum
-                    others.keys.forEach { k -> map[k] = (map[k] ?: 0.0) * scale }
-                    remainingRemoval = 0.0
+
+            // Triple Legendary and Mythic AFTER normal calculation
+            map["Legendary"] = (map["Legendary"] ?: 0.0) * 3.0
+            map["Mythic"] = (map["Mythic"] ?: 0.0) * 3.0
+
+            // Keep Rare static (do not modify from its current value)
+            val rareFixed = map["Rare"] ?: 0.0
+
+            // Normalize to 100: reduce Uncommon/Epic first, then Legendary/Mythic if needed; never touch Rare, keep Common at 0
+            var sum = map.values.sum()
+            if (sum > 100.0 + 1e-9) {
+                val over = sum - 100.0
+                // First shrink Uncommon + Epic
+                val uePool = listOf("Uncommon", "Epic")
+                var ueSum2 = uePool.sumOf { map[it] ?: 0.0 }
+                var remainingOver = over
+                if (ueSum2 > 1e-9) {
+                    val ueScale = (ueSum2 - remainingOver).coerceAtLeast(0.0) / ueSum2
+                    uePool.forEach { k -> map[k] = (map[k] ?: 0.0) * ueScale }
+                    remainingOver -= (ueSum2 - (ueSum2 * ueScale))
                 }
+                if (remainingOver > 1e-6) {
+                    // Then shrink Legendary + Mythic proportionally
+                    val lmPool = listOf("Legendary", "Mythic")
+                    val lmSum = lmPool.sumOf { map[it] ?: 0.0 }
+                    if (lmSum > 1e-9) {
+                        val lmScale = (lmSum - remainingOver).coerceAtLeast(0.0) / lmSum
+                        lmPool.forEach { k -> map[k] = (map[k] ?: 0.0) * lmScale }
+                    }
+                }
+                // Restore Rare to its fixed value (in case tiny numeric drift)
+                map["Rare"] = rareFixed
+                sum = map.values.sum()
+            } else if (sum < 100.0 - 1e-9) {
+                map["Uncommon"] = (map["Uncommon"] ?: 0.0) + (100.0 - sum)
             }
-            // apply triple
-            tripleTargets.forEach { t -> map[t.name] = (map[t.name] ?: 0.0) * 3.0 }
-            // move any leftover removal to Uncommon add
-            val uncommonBase = map["Uncommon"] ?: 0.0
-            map["Uncommon"] = (uncommonBase + takeCommon + (map["Rare"] ?: 0.0))
-            return base.map { Cat(it.name, map[it.name] ?: 0.0) }
+
+            return order.map { Cat(it, map[it] ?: 0.0) }
         }
+
+        if (mult == 1.0) return finalizeWithRarityRod(base)
         val baseSum = base.sumOf { it.pct }
         val targetSet = targets.toSet()
         val targetBaseSum = base.filter { it.name in targetSet }.sumOf { it.pct }
@@ -122,10 +147,10 @@ class HookChanceDialog(x: Int, y: Int, key: String) : TridentDialog(x, y, key), 
         val targetNewSum = targetBaseSum * mult
 
         if (targetNewSum >= baseSum - 1e-9) {
-            return base.map { c ->
+            return finalizeWithRarityRod(base.map { c ->
                 val pct = if (c.name in targetSet) (c.pct / targetBaseSum) * baseSum else 0.0
                 Cat(c.name, pct)
-            }
+            })
         }
 
         if (line == UpgradeLine.WISE) {
@@ -147,17 +172,17 @@ class HookChanceDialog(x: Int, y: Int, key: String) : TridentDialog(x, y, key), 
                 val scale = if (currentTargetsSum <= 0.0) 0.0 else (currentTargetsSum - delta) / currentTargetsSum
                 targetSet.forEach { t -> pctMap[t]?.let { pctMap[t] = it * scale } }
             }
-            return base.map { c -> Cat(c.name, pctMap[c.name] ?: 0.0) }
+            return finalizeWithRarityRod(base.map { c -> Cat(c.name, pctMap[c.name] ?: 0.0) })
         }
 
         val nonTargetBaseSum = baseSum - targetBaseSum
         val nonTargetNewSum = baseSum - targetNewSum
         val nonTargetScale = if (nonTargetBaseSum <= 0.0) 0.0 else nonTargetNewSum / nonTargetBaseSum
 
-        return base.map { c ->
+        return finalizeWithRarityRod(base.map { c ->
             val pct = if (c.name in targetSet) c.pct * mult else c.pct * nonTargetScale
             Cat(c.name, pct)
-        }
+        })
     }
 
     private fun rarityColorFor(name: String): Int? = when (name.lowercase()) {

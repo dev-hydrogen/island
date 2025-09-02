@@ -169,6 +169,7 @@ object ItemParser {
         var spiritChanceBonusPercent: Double = 0.0,
         var wayfinderDataBonus: Double = 0.0,
         var fishChanceBonusPercent: Double = 0.0,
+        var stockLabel: String? = null,
     )
 
     fun parseSpotBonuses(lines: List<String>): SpotBonuses {
@@ -181,6 +182,7 @@ object ItemParser {
         val treasureRegex = Regex("([-+]?\\d+(?:\\.\\d+)?)%\\s*Treasure\\s*Chance", RegexOption.IGNORE_CASE)
         val spiritRegex = Regex("([-+]?\\d+(?:\\.\\d+)?)%\\s*Spirit\\s*Chance", RegexOption.IGNORE_CASE)
         val wayfinderRegex = Regex("([-+]?\\d+(?:\\.\\d+)?)\\s*Wayfinder\\s*Data", RegexOption.IGNORE_CASE)
+        val stockRegex = Regex("(?i)stock:\\s*(Plentiful|Very\\s*High|High|Medium|Low|Depleted)")
 
         fun mapHookLine(s: String): UpgradeLine? = when (s.lowercase()) {
             "strong" -> UpgradeLine.STRONG
@@ -241,6 +243,10 @@ object ItemParser {
             }
             wayfinderRegex.find(line)?.let { m ->
                 res.wayfinderDataBonus = (m.groupValues[1].toDoubleOrNull() ?: 0.0)
+                return@forEach
+            }
+            stockRegex.find(line)?.let { m ->
+                res.stockLabel = m.groupValues[1]
                 return@forEach
             }
         }

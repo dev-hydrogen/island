@@ -10,6 +10,9 @@ data class SpotState(
     var spiritChanceBonusPercent: Double = 0.0,
     var wayfinderDataBonus: Double = 0.0,
     var fishChanceBonusPercent: Double = 0.0,
+    var stockLabel: String? = null,
+    var observedNonJunkCatches: Int = 0,
+    var observedStockDecreases: Int = 0,
 )
 
 

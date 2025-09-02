@@ -77,6 +77,16 @@ class Config {
     @SerialEntry
     var gamesAutoFocus: Boolean = false
 
+    // Meters config
+    @SerialEntry
+    var metersShortWindowMinutes: Int = 10
+    @SerialEntry
+    var metersShortHalfLifeMinutes: Int = 3
+    @SerialEntry
+    var metersLongWindowMinutes: Int = 30
+    @SerialEntry
+    var metersLongHalfLifeMinutes: Int = 10
+
 
     @SerialEntry
     var killfeedEnabled: Boolean = true
@@ -171,6 +181,17 @@ class Config {
     object Games {
         val autoFocus: Boolean
             get() = handler.instance().gamesAutoFocus
+    }
+
+    object MetersConfig {
+        val shortWindowMinutes: Int
+            get() = handler.instance().metersShortWindowMinutes
+        val shortHalfLifeMinutes: Int
+            get() = handler.instance().metersShortHalfLifeMinutes
+        val longWindowMinutes: Int
+            get() = handler.instance().metersLongWindowMinutes
+        val longHalfLifeMinutes: Int
+            get() = handler.instance().metersLongHalfLifeMinutes
     }
 
     object KillFeed {
@@ -321,6 +342,39 @@ class Config {
                         description(OptionDescription.of(Component.translatable("config.trident.games.auto_focus.description")))
                         binding(handler.instance()::gamesAutoFocus, false)
                         controller(tickBox())
+                    }
+                }
+
+                groups.register("meters") {
+                    name(Component.translatable("config.trident.meters.name"))
+                    description(OptionDescription.of(Component.translatable("config.trident.meters.description")))
+
+                    options.register<Int>("meters_short_window_minutes") {
+                        name(Component.translatable("config.trident.meters.short_window.name"))
+                        description(OptionDescription.of(Component.translatable("config.trident.meters.short_window.description")))
+                        binding(handler.instance()::metersShortWindowMinutes, 10)
+                        controller(slider(IntRange(1, 60), 1))
+                    }
+
+                    options.register<Int>("meters_short_half_life_minutes") {
+                        name(Component.translatable("config.trident.meters.short_half_life.name"))
+                        description(OptionDescription.of(Component.translatable("config.trident.meters.short_half_life.description")))
+                        binding(handler.instance()::metersShortHalfLifeMinutes, 3)
+                        controller(slider(IntRange(1, 60), 1))
+                    }
+
+                    options.register<Int>("meters_long_window_minutes") {
+                        name(Component.translatable("config.trident.meters.long_window.name"))
+                        description(OptionDescription.of(Component.translatable("config.trident.meters.long_window.description")))
+                        binding(handler.instance()::metersLongWindowMinutes, 30)
+                        controller(slider(IntRange(5, 240), 5))
+                    }
+
+                    options.register<Int>("meters_long_half_life_minutes") {
+                        name(Component.translatable("config.trident.meters.long_half_life.name"))
+                        description(OptionDescription.of(Component.translatable("config.trident.meters.long_half_life.description")))
+                        binding(handler.instance()::metersLongHalfLifeMinutes, 10)
+                        controller(slider(IntRange(5, 240), 5))
                     }
                 }
 

@@ -47,6 +47,7 @@ object ChestScreenListener {
         if ("ISLAND REWARDS" in screen.title.string) {
             DelayedAction.delayTicks(2L) {
                 findQuests(screen)
+                findMeters(screen)
             }
         }
 
@@ -87,6 +88,61 @@ object ChestScreenListener {
 
         QuestingDialog.isDesynced = false
         QuestStorage.loadQuests(quests)
+    }
+
+    private fun parseMeterProgress(line: String): Pair<Int, Int>? {
+        // Progress: x,xxx/y,yyy XP
+        val m = Regex("(?i)Progress:\\s*([0-9,]+)\\/([0-9,]+)\\s*XP").find(line) ?: return null
+        val cur = m.groupValues[1].replace(",", "").toIntOrNull() ?: return null
+        val max = m.groupValues[2].replace(",", "").toIntOrNull() ?: return null
+        return Pair(cur, max)
+    }
+
+    private fun parseMeterClaims(line: String, label: String): Pair<Int, Int>? {
+        // label: Daily Claims or Stored Rewards
+        val m = Regex("(?i)$label:\\s*([0-9,]+)\\/([0-9,]+)").find(line) ?: return null
+        val cur = m.groupValues[1].replace(",", "").toIntOrNull() ?: return null
+        val max = m.groupValues[2].replace(",", "").toIntOrNull() ?: return null
+        return Pair(cur, max)
+    }
+
+    fun findMeters(screen: ContainerScreen) {
+        if ("ISLAND REWARDS" !in screen.title.string) return
+        val slots = screen.menu.slots
+
+        // Scan all visible slots for Daily Meter and Weekly Vault by name
+        slots.forEach { slot ->
+            val name = slot.item.displayName.string
+            val lore = slot.item.getLore().map { it.string }
+            when {
+                name.contains("Daily Meter", ignoreCase = true) -> {
+                    lore.forEach { line ->
+                        parseMeterProgress(line)?.let { (cur, max) ->
+                            TridentClient.playerState.dailyMeter.progressCurrent = cur
+                            TridentClient.playerState.dailyMeter.progressTarget = max
+                        }
+                        parseMeterClaims(line, "Daily Claims")?.let { (cur, max) ->
+                            TridentClient.playerState.dailyMeter.claimsCurrent = cur
+                            TridentClient.playerState.dailyMeter.claimsMax = max
+                        }
+                    }
+                }
+                name.contains("Weekly Vault", ignoreCase = true) -> {
+                    lore.forEach { line ->
+                        parseMeterProgress(line)?.let { (cur, max) ->
+                            TridentClient.playerState.weeklyMeter.progressCurrent = cur
+                            TridentClient.playerState.weeklyMeter.progressTarget = max
+                        }
+                        parseMeterClaims(line, "Stored Rewards")?.let { (cur, max) ->
+                            TridentClient.playerState.weeklyMeter.claimsCurrent = cur
+                            TridentClient.playerState.weeklyMeter.claimsMax = max
+                        }
+                    }
+                }
+            }
+        }
+
+        DialogCollection.refreshDialog("meter")
     }
 
     fun findAugments(screen: ContainerScreen) {

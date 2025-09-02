@@ -104,6 +104,13 @@ object NoxesiumUtils {
             QuestingDialog.currentGame = Game.entries.filter { g -> g.server == game }.getOrNull(0) ?: return
             DialogCollection.open(k, QuestingDialog(10, 10, k))
         }
+        // Ensure meter dialog is present in HUB
+        if (currentGame == Game.HUB || currentGame == Game.FISHING) {
+            val k = "meter"
+            if (DialogCollection.get(k) == null) {
+                DialogCollection.open(k, cc.pe3epwithyou.trident.interfaces.meter.MeterDialog(10, 60, k))
+            }
+        }
     }
 
     private fun removeKillsIfNeeded(packet: ClientboundMccGameStatePacket) {

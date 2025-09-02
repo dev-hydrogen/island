@@ -99,6 +99,11 @@ class QuestingDialog(x: Int, y: Int, key: String) : TridentDialog(x, y, key), Th
         quests.forEach { q ->
             QuestWidget(q, this@QuestingDialog).atBottom(0, settings = LayoutConstants.LEFT)
         }
+        // Footnote credit
+        StringWidget(
+            Component.literal("Module Credit: pe3ep & archi").mccFont().withStyle(ChatFormatting.GRAY),
+            font
+        ).atBottom(0, settings = LayoutConstants.LEFT)
     }
 
     override fun refresh() {

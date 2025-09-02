@@ -124,6 +124,22 @@ object ChatEventListener {
             }
 
             if (message.isXPMessage()) {
+                // Calculate XP meters before early return on Supply Preserve
+                val m = Regex("(?i)You earned:\\s*([0-9,]+)\\s*Island XP").find(message.string)
+                val earned = m?.groupValues?.get(1)?.replace(",", "")?.toLongOrNull() ?: 0L
+                if (earned > 0) {
+                    val ps = TridentClient.playerState
+                    ps.dailyMeter.sessionXpGained += earned
+                    ps.weeklyMeter.sessionXpGained += earned
+                    if (ps.dailyMeter.progressTarget > 0) {
+                        cc.pe3epwithyou.trident.interfaces.meter.MeterCalculator.applyXpToDaily(earned.toInt())
+                    }
+                    if (ps.weeklyMeter.progressTarget > 0) {
+                        cc.pe3epwithyou.trident.interfaces.meter.MeterCalculator.applyXpToWeekly(earned.toInt())
+                    }
+                    DialogCollection.refreshDialog("meter")
+                }
+
                 if (isSupplyPreserve) {
                     isSupplyPreserve = false
                     catchFinished = true
@@ -185,6 +201,10 @@ object ChatEventListener {
                         a.usesCurrent?.let { c -> if (c != 0) a.usesCurrent = c - 1 }
                     }
                 }
+
+                // Track non-junk catches for Stock stats (actual stock decreases are detected via SpotEntityListener label changes)
+                val st = TridentClient.playerState.spot
+                if (st.hasSpot && !isJunk) st.observedNonJunkCatches += 1
 
                 catchFinished = true
                 lastCaughtMessage = null

@@ -64,6 +64,35 @@ object SpotEntityListener : ClientTickEvents.EndTick {
         st.spiritChanceBonusPercent = parsed.spiritChanceBonusPercent
         st.wayfinderDataBonus = parsed.wayfinderDataBonus
         st.fishChanceBonusPercent = parsed.fishChanceBonusPercent
+        // Detect stock label changes to track observed real stock decreases
+        parsed.stockLabel?.let { newLabel ->
+            val prevLabel = st.stockLabel
+            if (prevLabel != null && prevLabel != newLabel) {
+                fun rank(label: String): Int = when (label.lowercase()) {
+                    "plentiful" -> 5
+                    "very high" -> 4
+                    "high" -> 3
+                    "medium" -> 2
+                    "low" -> 1
+                    "depleted" -> 0
+                    else -> 0
+                }
+                val prevRank = rank(prevLabel)
+                val newRank = rank(newLabel)
+                if (newRank == 0) {
+                    // Depleted -> reset tracking immediately
+                    st.observedNonJunkCatches = 0
+                    st.observedStockDecreases = 0
+                } else if (newRank < prevRank) {
+                    st.observedStockDecreases += (prevRank - newRank)
+                } else if (newRank > prevRank) {
+                    // Stock increased (new spot or replenished) -> reset counters
+                    st.observedNonJunkCatches = 0
+                    st.observedStockDecreases = 0
+                }
+            }
+            st.stockLabel = newLabel
+        }
 
         DialogCollection.refreshDialog("hookchances")
         DialogCollection.refreshDialog("magnetchances")
@@ -114,6 +143,9 @@ object SpotEntityListener : ClientTickEvents.EndTick {
         st.spiritChanceBonusPercent = 0.0
         st.wayfinderDataBonus = 0.0
         st.fishChanceBonusPercent = 0.0
+        st.stockLabel = null
+        st.observedNonJunkCatches = 0
+        st.observedStockDecreases = 0
         DialogCollection.refreshDialog("hookchances")
         DialogCollection.refreshDialog("magnetchances")
         DialogCollection.refreshDialog("chanceperks")

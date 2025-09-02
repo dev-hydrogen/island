@@ -79,6 +79,8 @@ data class PlayerState(
     var tideLines: MutableSet<UpgradeLine> = mutableSetOf(),
     var windLines: MutableSet<UpgradeLine> = mutableSetOf(),
     var magnetPylonBonus: Int = 0,
+    var dailyMeter: MeterState = MeterState(),
+    var weeklyMeter: MeterState = MeterState(),
 )
 
 data class MutableAugment(
@@ -88,4 +90,18 @@ data class MutableAugment(
     var useCondition: UseCondition? = null,
     var paused: Boolean = false,
     var bannedInGrotto: Boolean = false,
+)
+
+data class MeterState(
+    var progressCurrent: Int = 0,
+    var progressTarget: Int = 0,
+    var claimsCurrent: Int = 0,
+    var claimsMax: Int = 0,
+    var sessionXpGained: Long = 0,
+    var sessionStartMs: Long = System.currentTimeMillis(),
+    var claimXpSequence: IntArray = intArrayOf(),
+    var xpEvents: MutableList<Pair<Long, Int>> = mutableListOf(),
+    var emaShortXpPerHour: Double = 0.0,
+    var emaLongXpPerHour: Double = 0.0,
+    var lastEmaUpdateMs: Long = System.currentTimeMillis(),
 )
