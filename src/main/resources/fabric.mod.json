@@ -41,5 +41,8 @@
     "fabric-language-kotlin": ">=${kotlin_loader_version}",
     "fabric": "*",
     "minecraft": "${minecraft_version}"
+  },
+  "conflicts": {
+    "trident": "*"
   }
 }
