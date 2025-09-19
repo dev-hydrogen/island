@@ -4,6 +4,7 @@ import cc.pe3epwithyou.trident.client.TridentClient
 import cc.pe3epwithyou.trident.interfaces.shared.TridentDialog
 import cc.pe3epwithyou.trident.interfaces.themes.DialogTitle
 import cc.pe3epwithyou.trident.interfaces.themes.TridentThemed
+import cc.pe3epwithyou.trident.state.FontCollection
 import cc.pe3epwithyou.trident.state.Rarity
 import cc.pe3epwithyou.trident.state.fishing.UpgradeLine
 import cc.pe3epwithyou.trident.state.fishing.UpgradeType
@@ -28,7 +29,11 @@ class ChanceDialog(x: Int, y: Int, key: String) : TridentDialog(x, y, key), Them
     }
 
     private fun getWidgetTitle(): DialogTitleWidget {
-        val icon = Component.literal("\uE279").mccFont("icon").withStyle(Style.EMPTY.withShadowColor(0x0 opacity 0))
+        val icon = FontCollection.get("_fonts/icon/quest_log.png")
+            .withStyle(
+                Style.EMPTY
+                    .withShadowColor(0x0 opacity 0)
+            )
         val text = Component.literal(" CHANCES".uppercase()).mccFont()
         return DialogTitle(this, icon.append(text), TITLE_COLOR)
     }

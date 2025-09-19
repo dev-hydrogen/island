@@ -24,12 +24,12 @@ import net.minecraft.core.component.DataComponents
 object ChestScreenListener {
 
     private fun parseRarity(name: String): Rarity = when {
-        "Common" in name    -> Rarity.COMMON
-        "Uncommon" in name  -> Rarity.UNCOMMON
-        "Rare" in name      -> Rarity.RARE
-        "Epic" in name      -> Rarity.EPIC
+        "Common" in name -> Rarity.COMMON
+        "Uncommon" in name -> Rarity.UNCOMMON
+        "Rare" in name -> Rarity.RARE
+        "Epic" in name -> Rarity.EPIC
         "Legendary" in name -> Rarity.LEGENDARY
-        "Mythic" in name    -> Rarity.MYTHIC
+        "Mythic" in name -> Rarity.MYTHIC
         else -> Rarity.COMMON
     }
 
@@ -206,6 +206,7 @@ object ChestScreenListener {
                     availableSlots--
                     null
                 }
+
                 rawName.contains("Empty Supply Slot") -> null
                 else -> {
                     val cleanedName = rawName
@@ -219,7 +220,8 @@ object ChestScreenListener {
         } as MutableList<Augment?>
         ChatUtils.debugLog("""
             Augments: ${TridentClient.playerState.supplies.augments}
-        """.trimIndent())
+        """.trimIndent()
+        )
         TridentClient.playerState.supplies.augmentsAvailable = availableSlots
         // Parse uses for each augment; keep length aligned with augments list, skip locked/empty
         val mutableAugments = mutableListOf<MutableAugment>()
@@ -265,15 +267,18 @@ object ChestScreenListener {
         val unstableOverclock = screen.menu.slots[15]
         val unstableModel = unstableOverclock.item.components[DataComponents.ITEM_MODEL]
         if (unstableModel != null) {
-            TridentClient.playerState.supplies.overclocks.unstable.isAvailable = !unstableModel.path.startsWith("island_interface/locked")
+            TridentClient.playerState.supplies.overclocks.unstable.state.isAvailable =
+                !unstableModel.path.startsWith("island_interface/locked")
         }
-        TridentClient.playerState.supplies.overclocks.unstable.texture = ItemParser.getUnstableOverclock(unstableOverclock.item)
-        TridentClient.playerState.supplies.overclocks.unstable.level = ItemParser.getOverclockLevel(unstableOverclock.item)
+        TridentClient.playerState.supplies.overclocks.unstable.texture =
+            ItemParser.getUnstableOverclock(unstableOverclock.item)
+        TridentClient.playerState.supplies.overclocks.unstable.state.level = ItemParser.getOverclockLevel(unstableOverclock.item)
 
         val supremeOverclock = screen.menu.slots[16]
         val supremeModel = supremeOverclock.item.components[DataComponents.ITEM_MODEL]
         if (supremeModel != null) {
-            TridentClient.playerState.supplies.overclocks.supreme.isAvailable = !supremeModel.path.startsWith("island_interface/locked")
+            TridentClient.playerState.supplies.overclocks.supreme.state.isAvailable =
+                !supremeModel.path.startsWith("island_interface/locked")
         }
         TridentClient.playerState.supplies.overclocks.stableLevels.hook = ItemParser.getOverclockLevel(hookOverclock.item)
         TridentClient.playerState.supplies.overclocks.stableLevels.magnet = ItemParser.getOverclockLevel(magnetOverclock.item)

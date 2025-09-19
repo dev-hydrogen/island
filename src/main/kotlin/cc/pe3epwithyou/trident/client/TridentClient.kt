@@ -24,6 +24,7 @@ import cc.pe3epwithyou.trident.interfaces.fishing.ChancePerksDialog
 import cc.pe3epwithyou.trident.interfaces.fishing.SpotDialog
 import cc.pe3epwithyou.trident.state.MCCIState
 import cc.pe3epwithyou.trident.state.PlayerState
+import cc.pe3epwithyou.trident.state.PlayerStateIO
 import cc.pe3epwithyou.trident.utils.ChatUtils
 import cc.pe3epwithyou.trident.utils.DelayedAction
 import cc.pe3epwithyou.trident.utils.TridentFont
@@ -34,6 +35,7 @@ import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper
 import net.minecraft.ChatFormatting
@@ -59,7 +61,7 @@ class TridentClient : ClientModInitializer {
     )
 
     companion object {
-        val playerState = PlayerState()
+        var playerState = PlayerState()
         lateinit var settingsKeymapping: KeyMapping
         var jokeCooldown: Boolean = false
     }
@@ -150,6 +152,21 @@ class TridentClient : ClientModInitializer {
                         }
                         0
                     }
+            ).then(
+                ClientCommandManager.literal("resetPlayerState")
+                    .executes { _ ->
+                        playerState = PlayerState()
+                        PlayerStateIO.load()
+                        DialogCollection.refreshOpenedDialogs()
+                        val c = Component.literal("Player state has been ")
+                            .withColor(TridentFont.TRIDENT_COLOR)
+                            .append(
+                                Component.literal("successfully reset")
+                                    .withColor(TridentFont.TRIDENT_ACCENT)
+                            )
+                        ChatUtils.sendMessage(c, true)
+                        0
+                    }
             )
 
     override fun onInitializeClient() {
@@ -192,5 +209,12 @@ class TridentClient : ClientModInitializer {
         }
 
         DialogCollection.loadAllDialogs()
+        playerState = PlayerStateIO.load()
+
+        ClientLifecycleEvents.CLIENT_STOPPING.register { onShutdownClient() }
+    }
+
+    private fun onShutdownClient() {
+        PlayerStateIO.save()
     }
 }

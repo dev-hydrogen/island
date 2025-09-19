@@ -42,6 +42,16 @@ object NoxesiumUtils {
         )
     }
 
+    fun skullComponentTexture(
+        skin: String, grayscale: Boolean = false, advance: Int = 0, ascent: Int = 0, scale: Float = 1.0F
+    ): MutableComponent {
+        return MutableComponent.create(
+            SkullContents(
+                Optional.empty(), Optional.of(skin), grayscale, advance, ascent, scale
+            )
+        )
+    }
+
     private fun updateGameDialogs(currentGame: Game, game: String) {
         // If we are staying in the same game and it's Fishing, keep existing dialogs and state (avoid resetting dropdowns)
         if (currentGame == MCCIState.game && currentGame == Game.FISHING) {

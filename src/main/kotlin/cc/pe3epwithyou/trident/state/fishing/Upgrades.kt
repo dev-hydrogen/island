@@ -1,5 +1,7 @@
 package cc.pe3epwithyou.trident.state.fishing
 
+import kotlinx.serialization.Serializable
+
 enum class UpgradeLine(
     val hookLabel: String,
     val magnetLabel: String,
@@ -54,6 +56,7 @@ enum class UpgradeType(val maxLevel: Int) {
     CHANCE(10)
 }
 
+@Serializable
 data class PlayerUpgrades(
     val levels: MutableMap<UpgradeLine, MutableMap<UpgradeType, Int>> = mutableMapOf()
 ) {

@@ -7,6 +7,7 @@ import cc.pe3epwithyou.trident.interfaces.themes.TridentThemed
 import cc.pe3epwithyou.trident.state.fishing.UpgradeLine
 import cc.pe3epwithyou.trident.state.FishRarityColor
 import cc.pe3epwithyou.trident.state.FishWeightColor
+import cc.pe3epwithyou.trident.state.FontCollection
 import cc.pe3epwithyou.trident.state.PearlQualityColor
 import cc.pe3epwithyou.trident.state.SpiritPurityColor
 import cc.pe3epwithyou.trident.state.TreasureRarityColor
@@ -34,9 +35,11 @@ class UpgradesDialog(x: Int, y: Int, key: String) : TridentDialog(x, y, key), Th
     }
 
     private fun getWidgetTitle(): DialogTitleWidget {
-        val icon = Component.literal("\uE279")
-            .mccFont("icon")
-            .withStyle(Style.EMPTY.withShadowColor(0x0 opacity 0))
+        val icon = FontCollection.get("_fonts/icon/quest_log.png")
+            .withStyle(
+                Style.EMPTY
+                    .withShadowColor(0x0 opacity 0)
+            )
         val text = Component.literal(" UPGRADES".uppercase()).mccFont()
         return DialogTitle(this, icon.append(text), TITLE_COLOR)
     }
@@ -77,7 +80,7 @@ class UpgradesDialog(x: Int, y: Int, key: String) : TridentDialog(x, y, key), Th
     private fun unstableBonusFor(line: UpgradeLine, type: UpgradeType): Int {
         if (type != UpgradeType.CHANCE) return 0
         val unstable = TridentClient.playerState.supplies.overclocks.unstable
-        if (!unstable.isActive) return 0
+        if (!unstable.state.isActive) return 0
         val tex = unstable.texture ?: return 0
         val matchLine = when (tex) {
             OverclockTexture.STRONG_UNSTABLE -> UpgradeLine.STRONG
@@ -88,7 +91,7 @@ class UpgradesDialog(x: Int, y: Int, key: String) : TridentDialog(x, y, key), Th
             else -> return 0
         }
         if (matchLine != line) return 0
-        return unstable.level ?: 0
+        return unstable.state.level ?: 0
     }
 
     override fun layout(): GridLayout = grid {

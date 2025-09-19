@@ -6,7 +6,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 
 object ChatUtils {
-    private const val PREFIX = "[Trident]"
+    private const val PREFIX = "[Island++]"
 
     fun info(s: String) {
         Trident.LOGGER.info("$PREFIX $s")

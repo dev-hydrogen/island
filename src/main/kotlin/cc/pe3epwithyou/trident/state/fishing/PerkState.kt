@@ -82,7 +82,7 @@ object PerkStateCalculator {
                 } ?: 0
                 val oc = if (overclockLineForType(type) == line) ocLevel else 0
 
-                val unstable = if (type == UpgradeType.CHANCE && player.supplies.overclocks.unstable.isActive) {
+                val unstable = if (type == UpgradeType.CHANCE && player.supplies.overclocks.unstable.state.isActive) {
                     val tex = supplies.overclocks.unstable.texture
                     val lineMatch = when (tex) {
                         OverclockTexture.STRONG_UNSTABLE -> UpgradeLine.STRONG
@@ -92,7 +92,7 @@ object PerkStateCalculator {
                         OverclockTexture.LUCKY_UNSTABLE -> UpgradeLine.LUCKY
                         else -> null
                     }
-                    if (lineMatch == line) supplies.overclocks.unstable.level ?: 0 else 0
+                    if (lineMatch == line) supplies.overclocks.unstable.state.level ?: 0 else 0
                 } else 0
 
                 val equipment = when (type) {
