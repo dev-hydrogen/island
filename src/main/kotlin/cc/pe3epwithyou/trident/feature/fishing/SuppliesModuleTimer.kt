@@ -3,11 +3,11 @@ package cc.pe3epwithyou.trident.feature.fishing
 import cc.pe3epwithyou.trident.client.TridentClient
 import cc.pe3epwithyou.trident.interfaces.DialogCollection
 import cc.pe3epwithyou.trident.utils.ChatUtils
+import cc.pe3epwithyou.trident.utils.Resources
 import cc.pe3epwithyou.trident.utils.TridentFont
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.SoundEvent
 import java.util.*
 
@@ -26,7 +26,7 @@ class SuppliesModuleTimer : ClientTickEvents.EndTick {
     }
 
     fun startUnstableOverclock() {
-        val unstableOverclockState = TridentClient.playerState.supplies.overclocks.unstable
+        val unstableOverclockState = TridentClient.playerState.supplies.overclocks.unstable.state
         this.unstableOverclock = unstableOverclockState.duration
         this.unstableOverclockCooldown = unstableOverclockState.cooldownDuration
 
@@ -35,7 +35,7 @@ class SuppliesModuleTimer : ClientTickEvents.EndTick {
     }
 
     fun startSupremeOverclock() {
-        val supremeOverclockState = TridentClient.playerState.supplies.overclocks.supreme
+        val supremeOverclockState = TridentClient.playerState.supplies.overclocks.supreme.state
         this.supremeOverclock = supremeOverclockState.duration
         this.supremeOverclockCooldown = supremeOverclockState.cooldownDuration
 
@@ -51,7 +51,7 @@ class SuppliesModuleTimer : ClientTickEvents.EndTick {
     }
 
     private fun tickUnstableOverclock() {
-        val unstableOverclockState = TridentClient.playerState.supplies.overclocks.unstable
+        val unstableOverclockState = TridentClient.playerState.supplies.overclocks.unstable.state
         if (!unstableOverclockState.isActive) return
 
         if (this.unstableOverclock % 20 == 0L) {
@@ -74,7 +74,7 @@ class SuppliesModuleTimer : ClientTickEvents.EndTick {
     }
 
     private fun tickUnstableOverclockCooldown() {
-        val unstableOverclockState = TridentClient.playerState.supplies.overclocks.unstable
+        val unstableOverclockState = TridentClient.playerState.supplies.overclocks.unstable.state
         if (!unstableOverclockState.isCooldown) return
 
         if (this.unstableOverclockCooldown % 20 == 0L) {
@@ -97,7 +97,7 @@ class SuppliesModuleTimer : ClientTickEvents.EndTick {
     }
 
     private fun tickSupremeOverclock() {
-        val supremeOverclockState = TridentClient.playerState.supplies.overclocks.supreme
+        val supremeOverclockState = TridentClient.playerState.supplies.overclocks.supreme.state
         if (!supremeOverclockState.isActive) return
 
         if (this.supremeOverclock % 20 == 0L) {
@@ -120,7 +120,7 @@ class SuppliesModuleTimer : ClientTickEvents.EndTick {
     }
 
     private fun tickSupremeOverclockCooldown() {
-        val supremeOverclockState = TridentClient.playerState.supplies.overclocks.supreme
+        val supremeOverclockState = TridentClient.playerState.supplies.overclocks.supreme.state
         if (!supremeOverclockState.isCooldown) return
 
         if (this.supremeOverclockCooldown % 20 == 0L) {
@@ -145,10 +145,13 @@ class SuppliesModuleTimer : ClientTickEvents.EndTick {
     private fun sendReadyMessage(oc: String) {
         val component = Component.literal("Your ").withColor(TridentFont.TRIDENT_COLOR)
             .append(Component.literal(oc).withColor(TridentFont.TRIDENT_ACCENT))
-            .append(Component.literal(" is no longer on cooldown and is ready to be used").withColor(TridentFont.TRIDENT_COLOR))
+            .append(
+                Component.literal(" is no longer on cooldown and is ready to be used")
+                    .withColor(TridentFont.TRIDENT_COLOR)
+            )
         ChatUtils.sendMessage(component, true)
         Minecraft.getInstance().player?.playSound(
-            SoundEvent(ResourceLocation.fromNamespaceAndPath("mcc", "games.fishing.overclock_ready"), Optional.empty())
+            SoundEvent(Resources.mcc("games.fishing.overclock_ready"), Optional.empty())
         )
     }
 }
