@@ -536,7 +536,7 @@ class Config {
                             OptionDescription.createBuilder()
                                 .text(Component.translatable("config.trident.fishing.upgrades_module.description"))
                                 .image(
-                                    ResourceLocation.fromNamespaceAndPath("trident", "textures/config/upgrades_module.png"),
+                                    Resources.trident("textures/config/upgrades_module.png"),
                                     598,
                                     234
                                 ).build()
@@ -551,7 +551,7 @@ class Config {
                             OptionDescription.createBuilder()
                                 .text(Component.translatable("config.trident.fishing.spot_module.description"))
                                 .image(
-                                    ResourceLocation.fromNamespaceAndPath("trident", "textures/config/spot_module.png"),
+                                    Resources.trident("textures/config/spot_module.png"),
                                     367,
                                     225
                                 ).build()
@@ -566,7 +566,7 @@ class Config {
                             OptionDescription.createBuilder()
                                 .text(Component.translatable("config.trident.fishing.hook_chances_module.description"))
                                 .image(
-                                    ResourceLocation.fromNamespaceAndPath("trident", "textures/config/hook_module.png"),
+                                    Resources.trident("textures/config/hook_module.png"),
                                     440,
                                     287
                                 ).build()
@@ -581,7 +581,7 @@ class Config {
                             OptionDescription.createBuilder()
                                 .text(Component.translatable("config.trident.fishing.magnet_chances_module.description"))
                                 .image(
-                                    ResourceLocation.fromNamespaceAndPath("trident", "textures/config/magnet_module.png"),
+                                    Resources.trident("textures/config/magnet_module.png"),
                                     485,
                                     292
                                 ).build()
@@ -596,7 +596,7 @@ class Config {
                             OptionDescription.createBuilder()
                                 .text(Component.translatable("config.trident.fishing.rod_chances_module.description"))
                                 .image(
-                                    ResourceLocation.fromNamespaceAndPath("trident", "textures/config/rod_module.png"),
+                                    Resources.trident("textures/config/rod_module.png"),
                                     323,
                                     268
                                 ).build()
@@ -618,7 +618,7 @@ class Config {
                             OptionDescription.createBuilder()
                                 .text(Component.translatable("config.trident.fishing.chance_perks_module.description"))
                                 .image(
-                                    ResourceLocation.fromNamespaceAndPath("trident", "textures/config/chance_module.png"),
+                                    Resources.trident("textures/config/chance_module.png"),
                                     507,
                                     333
                                 ).build()

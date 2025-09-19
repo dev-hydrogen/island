@@ -12,6 +12,7 @@ import cc.pe3epwithyou.trident.state.fishing.UpgradeLine
 
 import cc.pe3epwithyou.trident.utils.ChatUtils
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 import kotlinx.serialization.json.Json
 import net.fabricmc.loader.api.FabricLoader
 import java.nio.file.Files
@@ -35,7 +36,8 @@ data class UnstableOverclock(
         cooldownLeft = 0,
         cooldownDuration = 60 * 45 * 20,
         isActive = false,
-        isCooldown = false
+        isCooldown = false,
+        level = null
     )
 )
 
@@ -48,7 +50,8 @@ data class SupremeOverclock(
         cooldownLeft = 0,
         cooldownDuration = 60 * 60 * 20,
         isCooldown = false,
-        isActive = false
+        isActive = false,
+        level = null
     )
 )
 
@@ -60,7 +63,8 @@ data class OverclockState(
     var cooldownLeft: Long,
     var cooldownDuration: Long,
     var isActive: Boolean,
-    var isCooldown: Boolean
+    var isCooldown: Boolean,
+    var level: Int? = null,
 )
 
 @Serializable
@@ -95,14 +99,14 @@ data class Supplies(
 data class PlayerState(
     var supplies: Supplies = Supplies(),
     var upgrades: PlayerUpgrades = PlayerUpgrades(),
-    var perkState: PerkState = PerkState(),
-    var spot: SpotState = SpotState(),
-    var inGrotto: Boolean = false,
-    var tideLines: MutableSet<UpgradeLine> = mutableSetOf(),
-    var windLines: MutableSet<UpgradeLine> = mutableSetOf(),
-    var magnetPylonBonus: Int = 0,
-    var dailyMeter: MeterState = MeterState(),
-    var weeklyMeter: MeterState = MeterState(),
+    @Transient var perkState: PerkState = PerkState(),
+    @Transient var spot: SpotState = SpotState(),
+    @Transient var inGrotto: Boolean = false,
+    @Transient var tideLines: MutableSet<UpgradeLine> = mutableSetOf(),
+    @Transient var windLines: MutableSet<UpgradeLine> = mutableSetOf(),
+    @Transient var magnetPylonBonus: Int = 0,
+    @Transient var dailyMeter: MeterState = MeterState(),
+    @Transient var weeklyMeter: MeterState = MeterState(),
 )
 
 @Serializable
@@ -115,7 +119,6 @@ data class MutableAugment(
     var bannedInGrotto: Boolean = false,
 )
 
-@Serializable
 data class MeterState(
     var progressCurrent: Int = 0,
     var progressTarget: Int = 0,

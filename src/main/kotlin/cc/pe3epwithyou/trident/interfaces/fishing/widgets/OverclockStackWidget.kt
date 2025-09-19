@@ -70,15 +70,15 @@ class OverclockStackWidget(
             height,
             unstableTexture,
             2,
-            getOverclockComponent(overclockState.unstable, overclockState.unstable.level),
-            levelLabel = levelComponent(overclockState.unstable.level)
+            getOverclockComponent(overclockState.unstable.state),
+            levelLabel = levelComponent(overclockState.unstable.state.level)
         )
         if (overclockState.supreme.state.isAvailable) +UnstableOverclockWidget(
             height,
             height,
             supremeTexture,
             0,
-            getOverclockComponent(overclockState.supreme, overclockState.supreme.level)
+            getOverclockComponent(overclockState.supreme.state)
         )
     }
 
@@ -87,12 +87,7 @@ class OverclockStackWidget(
         return Component.literal("$level").mccFont(offset = 1)
     }
 
-    private fun levelComponent(level: Int?): Component? {
-        if (level == null) return null
-        return Component.literal("$level").mccFont(offset = 1)
-    }
-
-    private fun getOverclockComponent(state: Overclock, level: Int?): Component {
+    private fun getOverclockComponent(state: OverclockState): Component {
         val normalColors = listOf(
             TridentColor(0xFFFFFF),
             TridentColor(0xFFFFFF),

@@ -272,7 +272,7 @@ object ChestScreenListener {
         }
         TridentClient.playerState.supplies.overclocks.unstable.texture =
             ItemParser.getUnstableOverclock(unstableOverclock.item)
-        TridentClient.playerState.supplies.overclocks.unstable.level = ItemParser.getOverclockLevel(unstableOverclock.item)
+        TridentClient.playerState.supplies.overclocks.unstable.state.level = ItemParser.getOverclockLevel(unstableOverclock.item)
 
         val supremeOverclock = screen.menu.slots[16]
         val supremeModel = supremeOverclock.item.components[DataComponents.ITEM_MODEL]
