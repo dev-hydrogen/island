@@ -3,6 +3,7 @@ package cc.pe3epwithyou.trident.interfaces.meter
 import cc.pe3epwithyou.trident.client.TridentClient
 import cc.pe3epwithyou.trident.interfaces.shared.TridentDialog
 import cc.pe3epwithyou.trident.interfaces.themes.TridentThemed
+import cc.pe3epwithyou.trident.state.FontCollection
 import cc.pe3epwithyou.trident.utils.extensions.ComponentExtensions.mccFont
 import com.noxcrew.sheeplib.LayoutConstants
 import com.noxcrew.sheeplib.layout.grid
@@ -22,12 +23,9 @@ class MeterDialog(x: Int, y: Int, key: String) : TridentDialog(x, y, key), Theme
         var row = 0
 
         // Progress bar (styled like QuestWidget)
-        val PROGRESS_BLANK = '\uE266'
-        val PROGRESS_HALF = '\uE26C'
-        val PROGRESS_FULL = '\uE269'
-        val COMP_BLANK: Component = Component.literal(PROGRESS_BLANK.toString()).mccFont("icon")
-        val COMP_HALF: Component = Component.literal(PROGRESS_HALF.toString()).mccFont("icon")
-        val COMP_FULL: Component = Component.literal(PROGRESS_FULL.toString()).mccFont("icon")
+        val COMP_BLANK = FontCollection.get("_fonts/icon/progress_counter/empty.png", 7, 7)
+        val COMP_HALF = FontCollection.get("_fonts/icon/progress_counter/half.png", 7, 7)
+        val COMP_FULL = FontCollection.get("_fonts/icon/progress_counter/full.png", 7, 7)
 
         fun progressBarComponent(progress: Float, width: Int, groups: Int = 0): Component {
             if (width <= 0) return Component.empty()
