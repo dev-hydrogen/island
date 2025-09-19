@@ -22,8 +22,8 @@ import java.time.Duration
 
 object UpdateChecker {
     private var currentVersion: Version? = null
-    private const val PROJECT_ID = "L6RCcsrd"
-    private const val MOD_ID = "trident"
+    private const val PROJECT_ID = "Rbw0l2D4"
+    private const val MOD_ID = "islandplusplus"
 
     private val client = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build()
     private val JSON = Json.Default
@@ -40,7 +40,7 @@ object UpdateChecker {
         CoroutineScope(background).launch {
             val req =
                 HttpRequest.newBuilder().uri(URI.create("https://api.modrinth.com/v2/project/$PROJECT_ID/version"))
-                    .GET().setHeader("User-Agent", "trident-mc-mod").build()
+                    .GET().setHeader("User-Agent", "islandplusplus-mc-mod").build()
             val body = client.sendAsync(req, HttpResponse.BodyHandlers.ofString()).await().body()
             Minecraft.getInstance().execute {
                 handleResponse(body)
@@ -71,7 +71,7 @@ object UpdateChecker {
     }
 
     private fun sendUpdateAvailableMessage(new: String) {
-        val component = Component.literal("New Trident version available: ").withColor(TridentFont.TRIDENT_COLOR)
+        val component = Component.literal("New Island++ version available: ").withColor(TridentFont.TRIDENT_COLOR)
             .append(Component.literal(currentVersion?.friendlyString ?: "Unknown").withColor(TridentFont.TRIDENT_COLOR))
             .append(Component.literal(" -> ").withColor(TridentFont.TRIDENT_COLOR))
             .append(Component.literal(new).withColor(TridentFont.TRIDENT_ACCENT)).append(

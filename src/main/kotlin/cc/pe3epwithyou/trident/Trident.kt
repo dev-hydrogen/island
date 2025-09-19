@@ -12,7 +12,7 @@ class Trident : ModInitializer {
         val LOGGER: Logger = LoggerFactory.getLogger(this.toString())
     }
     override fun onInitialize() {
-        LOGGER.info("[Trident] Initializing Client...")
+        LOGGER.info("[Island++] Initializing Client...")
         Config.init()
         NoxesiumUtils.registerListeners()
         UpdateChecker.init()
