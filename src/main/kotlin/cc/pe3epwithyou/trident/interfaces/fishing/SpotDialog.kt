@@ -22,6 +22,7 @@ import com.noxcrew.sheeplib.util.opacity
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.components.StringWidget
+import net.minecraft.client.gui.components.Tooltip
 import net.minecraft.client.gui.layouts.GridLayout
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
@@ -44,6 +45,7 @@ class SpotDialog(x: Int, y: Int, key: String) : TridentDialog(x, y, key), Themed
     override var title = getWidgetTitle()
 
     private var expectedExpanded: Boolean = false
+    private var showAbsolutePercent: Boolean = false
 
     override fun layout(): GridLayout = grid {
         val font = Minecraft.getInstance().font
@@ -99,8 +101,8 @@ class SpotDialog(x: Int, y: Int, key: String) : TridentDialog(x, y, key), Themed
                 else -> fishBase
             }
             var pPearl = 5.0 + ptsGlim * 0.5 + (if (spot.hasSpot) spot.pearlChanceBonusPercent else 0.0) + (if (winds.contains(UpgradeLine.GLIMMERING)) 5.0 else 0.0)
-            var pTreasure = 1.0 + ptsGreedy * 0.1 + (if (spot.hasSpot) spot.treasureChanceBonusPercent else 0.0) + (if (winds.contains(UpgradeLine.GREEDY)) 10.0 else 0.0)
-            var pSpirit = 2.0 + ptsLucky * 0.2 + (if (spot.hasSpot) spot.spiritChanceBonusPercent else 0.0) + (if (winds.contains(UpgradeLine.LUCKY)) 5.0 else 0.0)
+            var pTreasure = 1.0 + ptsGreedy * 0.1 + (if (spot.hasSpot) spot.treasureChanceBonusPercent else 0.0) + (if (winds.contains(UpgradeLine.GREEDY)) 1.0 else 0.0)
+            var pSpirit = 2.0 + ptsLucky * 0.2 + (if (spot.hasSpot) spot.spiritChanceBonusPercent else 0.0) + (if (winds.contains(UpgradeLine.LUCKY)) 2.0 else 0.0)
             val pElusiveBase = (ptsStrong * 0.5 + (if (spot.hasSpot) spot.elusiveChanceBonusPercent else 0.0) + (if (winds.contains(UpgradeLine.STRONG)) 5.0 else 0.0) + (if (hasElusiveLure) 100.0 else 0.0)).coerceAtMost(100.0)
 
             if (guaranteedType != null) {
@@ -122,14 +124,14 @@ class SpotDialog(x: Int, y: Int, key: String) : TridentDialog(x, y, key), Themed
             val trend = when {
                 decreases > expectedDecreases + 1e-6 -> Component.literal("(decreasing faster than avg)").mccFont().withStyle(ChatFormatting.RED)
                 decreases < expectedDecreases - 1e-6 -> Component.literal("(decreasing slower than avg)").mccFont().withStyle(ChatFormatting.GREEN)
-                else -> Component.literal("(on average)").mccFont().withStyle(ChatFormatting.GRAY)
+                else -> Component.literal("(average decrease rate)").mccFont().withStyle(ChatFormatting.GRAY)
             }
             StringWidget(Component.literal("Stock: ").mccFont()
                 .append(Component.literal(label).mccFont().withStyle(ChatFormatting.AQUA))
                 .append(Component.literal("  ").mccFont())
                 .append(trend), font).at(row++, 0, settings = LayoutConstants.LEFT)
 
-            // Expected catches remaining estimator by bucket (rough heuristic)
+        // Expected catches remaining estimator by bucket (rough heuristic)
             val bucketSize = when (label.lowercase()) {
                 "plentiful" -> 5
                 "very high" -> 4
@@ -153,6 +155,16 @@ class SpotDialog(x: Int, y: Int, key: String) : TridentDialog(x, y, key), Themed
                 expectedExpanded = !expectedExpanded
                 this@SpotDialog.refresh()
             }.bounds(0, 0, 120, 12).build().at(row++, 0, settings = LayoutConstants.LEFT)
+
+            // Toggle absolute % vs adjusted-to-remaining
+            val toggleLabel = if (showAbsolutePercent)
+                Component.literal("Showing: % per catch").mccFont().withStyle(ChatFormatting.AQUA)
+            else
+                Component.literal("Showing: expected counts").mccFont().withStyle(ChatFormatting.GRAY)
+            net.minecraft.client.gui.components.Button.builder(toggleLabel) {
+                showAbsolutePercent = !showAbsolutePercent
+                this@SpotDialog.refresh()
+            }.bounds(0, 0, 150, 12).build().at(row++, 0, settings = LayoutConstants.LEFT)
 
             if (expectedExpanded) {
                 val catchesLeft = expectedCatchesPerBucket
@@ -183,9 +195,10 @@ class SpotDialog(x: Int, y: Int, key: String) : TridentDialog(x, y, key), Themed
                 val magXP = catchesLeft * (effMagPct(UpgradeLine.STRONG, "XP") / 100.0)
 
                 fun row(lbl: String, base: Double, @Suppress("UNUSED_PARAMETER") extra: Double, color: ChatFormatting = ChatFormatting.AQUA) {
+                    val valueText = if (showAbsolutePercent) "${"""%.2f""".format(base)}%" else "${"""%.2f""".format(base)}"
                     val comp = Component.literal("$lbl: ")
                         .mccFont()
-                        .append(Component.literal("${"""%.2f""".format(base)}").mccFont().withStyle(color))
+                        .append(Component.literal(valueText).mccFont().withStyle(color))
                     StringWidget(comp, font).at(row++, 0, settings = LayoutConstants.LEFT)
                 }
                 StringWidget(Component.literal("Expected catches (~${"""%.1f""".format(catchesLeft)})").mccFont().withStyle(ChatFormatting.GRAY), font)
@@ -195,16 +208,17 @@ class SpotDialog(x: Int, y: Int, key: String) : TridentDialog(x, y, key), Themed
                 val showTreasureRow = (guaranteedType == "Treasure") || (!fishSpot100 && guaranteedType == null && (expTreasure > 0.0 || magTreasure > 0.0))
                 val showSpiritRow = (guaranteedType == "Spirit") || (!fishSpot100 && guaranteedType == null && (expSpirit > 0.0 || magSpirit > 0.0))
 
-                if (showFishRow) row("Fish", expFish, magFish)
-                if (showPearlRow) row("Pearls", expPearl, magPearl)
-                if (showTreasureRow) row("Treasure", expTreasure, magTreasure)
-                if (showSpiritRow) row("Spirits", expSpirit, magSpirit)
-                if (showFishRow && expElusive > 0.0) {
+                if (showFishRow) row("Fish", if (showAbsolutePercent) pFish else expFish, magFish)
+                if (showPearlRow) row("Pearls", if (showAbsolutePercent) pPearl else expPearl, magPearl)
+                if (showTreasureRow) row("Treasure", if (showAbsolutePercent) pTreasure else expTreasure, magTreasure)
+                if (showSpiritRow) row("Spirits", if (showAbsolutePercent) pSpirit else expSpirit, magSpirit)
+                if (showFishRow && (expElusive > 0.0 || (showAbsolutePercent && pElusiveEff > 0.0))) {
+                    val elusiveText = if (showAbsolutePercent) "${"""%.2f""".format(pElusiveEff)}%" else "${"""%.2f""".format(expElusive)}"
                     StringWidget(Component.literal("Elusive Fish: ").mccFont()
-                        .append(Component.literal("${"""%.2f""".format(expElusive)}").mccFont().withStyle(ChatFormatting.RED)), font)
+                        .append(Component.literal(elusiveText).mccFont().withStyle(ChatFormatting.RED)), font)
                         .at(row++, 0, settings = LayoutConstants.LEFT)
                 }
-                if (expJunk > 0.0 && guaranteedType == null && !fishSpot100) row("Junk", expJunk, 0.0, ChatFormatting.GRAY)
+                if (expJunk > 0.0 && guaranteedType == null && !fishSpot100) row("Junk", if (showAbsolutePercent) pJunk * 100.0 else expJunk, 0.0, ChatFormatting.GRAY)
 
                 // Hook-affected expected type breakdowns
                 fun hookBase(line: UpgradeLine): List<Pair<String, Double>> = when (line) {
@@ -323,8 +337,13 @@ class SpotDialog(x: Int, y: Int, key: String) : TridentDialog(x, y, key), Themed
                     val sb = StringBuilder()
                     dist.forEachIndexed { idx, (k, v) ->
                         if (idx > 0) sb.append(" | ")
-                        val exp = catchesLeft * (pType / 100.0) * (v / 100.0)
-                        sb.append("$k ${"""%.2f""".format(exp)}")
+                        if (showAbsolutePercent) {
+                            val pct = (pType) * (v / 100.0)
+                            sb.append("$k ${"""%.2f""".format(pct)}%")
+                        } else {
+                            val exp = catchesLeft * (pType / 100.0) * (v / 100.0)
+                            sb.append("$k ${"""%.2f""".format(exp)}")
+                        }
                     }
                     StringWidget(Component.literal(sb.toString()).mccFont(), font).at(row++, 0, settings = LayoutConstants.LEFT)
                 }
@@ -341,6 +360,64 @@ class SpotDialog(x: Int, y: Int, key: String) : TridentDialog(x, y, key), Themed
                 val strongMap = asMap(strongDist)
                 val sizes = listOf("Average", "Large", "Massive", "Gargantuan")
                 val rarities = listOf("Common", "Uncommon", "Rare", "Epic", "Legendary", "Mythic")
+
+                // Helper to check if a fish is available at current time
+                fun isAllowedNow(catchTime: String): Boolean = when (catchTime.uppercase()) {
+                    "ALWAYS" -> true
+                    "DAY" -> TridentClient.playerState.isDayTime
+                    "NIGHT" -> !TridentClient.playerState.isDayTime
+                    else -> true
+                }
+
+                // Compute aggregate chance per catch to obtain ANY new fish (any uncaught rarity/size combo)
+                run {
+                    var newFishMass = 0.0
+                    val psLocal = TridentClient.playerState
+                    val islandNow = psLocal.currentCollection
+                    val pElusiveGivenFish = (pElusiveBase / 100.0)
+
+                    rarities.forEach { r ->
+                        val wFrac = (wiseMap[r] ?: 0.0) / 100.0
+                        if (wFrac <= 0.0) return@forEach
+                        sizes.forEach { s ->
+                            val sFrac = (strongMap[s] ?: 0.0) / 100.0
+                            if (sFrac <= 0.0) return@forEach
+                            val baseCellMass = (pFish / 100.0) * wFrac * sFrac
+                            if (baseCellMass <= 0.0) return@forEach
+
+                            val groupAll = psLocal.fishCollection.records.filter { rec ->
+                                (islandNow == null || rec.collection.equals(islandNow, true)) &&
+                                rec.rarity.name.equals(r, true) &&
+                                isAllowedNow(rec.catchTime)
+                            }
+
+                            if (groupAll.isEmpty()) return@forEach
+                            val totalElu = groupAll.count { it.elusive }
+                            val totalNon = groupAll.size - totalElu
+
+                            val uncaughtNow = groupAll.filter { rec ->
+                                !rec.caughtWeights.any { w -> w.equals(s, true) }
+                            }
+
+                            uncaughtNow.forEach { rec ->
+                                val share = if (rec.elusive) {
+                                    if (totalElu == 0) 0.0 else baseCellMass * pElusiveGivenFish / totalElu
+                                } else {
+                                    if (totalNon == 0) 0.0 else baseCellMass * (1.0 - pElusiveGivenFish) / totalNon
+                                }
+                                newFishMass += share
+                            }
+                        }
+                    }
+
+                    if (newFishMass > 0.0) {
+                        val pct = newFishMass * 100.0
+                        val comp = Component.literal("New Fish %: ").mccFont()
+                            .append(Component.literal("${"""%.2f""".format(pct)}%")
+                                .mccFont().withStyle(ChatFormatting.GOLD))
+                        StringWidget(comp, font).at(row++, 0, settings = LayoutConstants.LEFT)
+                    }
+                }
 
                 // Proper table: Fish rarity (rows) x size (columns), letters colored
                 fun rarityColor(r: String): Int = when (r) {
@@ -360,12 +437,29 @@ class SpotDialog(x: Int, y: Int, key: String) : TridentDialog(x, y, key), Themed
                     else -> ChatFormatting.WHITE.color!!
                 }
 
-                // Render header as a single line: A L M G (colored)
+                // Compute fixed column widths based on current display mode text lengths
+                val colWidths: List<Int> = sizes.map { s ->
+                    var maxLen = 0
+                    rarities.forEach { r ->
+                        val wFrac = (wiseMap[r] ?: 0.0) / 100.0
+                        val sFrac = (strongMap[s] ?: 0.0) / 100.0
+                        val value = if (showAbsolutePercent) (pFish) * wFrac * sFrac else catchesLeft * (pFish / 100.0) * wFrac * sFrac
+                        val text = if (showAbsolutePercent) "${"""%.2f""".format(value)}%" else "${"""%.2f""".format(value)}"
+                        if (text.length > maxLen) maxLen = text.length
+                    }
+                    // Two leading spaces are printed before each value in rows
+                    2 + maxLen
+                }
+
+                // Render header aligned to computed column widths
                 if (showFishRow) run {
-                    var headerComp = Component.literal("     ").mccFont()
-                    sizes.forEach { s ->
+                    var headerComp = Component.literal("").mccFont()
+                    sizes.forEachIndexed { idx, s ->
                         val letter = s.first().uppercase()
-                        headerComp = headerComp.append(Component.literal("$letter     ").mccFont().withColor(sizeColor(s)))
+                        val pad = (colWidths[idx] - 1).coerceAtLeast(0)
+                        headerComp = headerComp.append(
+                            Component.literal(" ".repeat(pad) + letter).mccFont().withColor(sizeColor(s))
+                        )
                     }
                     StringWidget(headerComp, font).at(row++, 0, settings = LayoutConstants.LEFT).alignLeft()
                 }
@@ -374,12 +468,73 @@ class SpotDialog(x: Int, y: Int, key: String) : TridentDialog(x, y, key), Themed
                     rarities.forEach { r ->
                         val wPct = (wiseMap[r] ?: 0.0) / 100.0
                         var lineComp = Component.literal(r.first().uppercase()).mccFont().withColor(rarityColor(r))
-                        sizes.forEach { s ->
+                        val tooltipSections: MutableList<Component> = mutableListOf()
+                        val ps = TridentClient.playerState
+                        val island = ps.currentCollection
+                        sizes.forEachIndexed { ci, s ->
                             val sPct = (strongMap[s] ?: 0.0) / 100.0
-                            val exp = catchesLeft * (pFish/100.0) * wPct * sPct
-                            lineComp = lineComp.append(Component.literal("  ${"""%.2f""".format(exp)}").mccFont().withStyle(ChatFormatting.AQUA))
+                            val value = if (showAbsolutePercent) (pFish) * wPct * sPct else catchesLeft * (pFish/100.0) * wPct * sPct
+                            val text = if (showAbsolutePercent) "${"""%.2f""".format(value)}%" else "${"""%.2f""".format(value)}"
+                            // Highlight uncaught fish by rarity-size combo when available at current time of day and island
+                            val candidates = ps.fishCollection.records.filter { rec ->
+                                (island == null || rec.collection.equals(island, true)) &&
+                                rec.rarity.name.equals(r, true)
+                            }
+                            val anyAllowedNow = candidates.any { rec -> isAllowedNow(rec.catchTime) }
+                            val allCaughtThisSize = candidates.filter { rec -> isAllowedNow(rec.catchTime) }
+                                .all { rec -> rec.caughtWeights.any { w -> w.equals(s, true) } }
+                            val highlight = anyAllowedNow && !allCaughtThisSize
+                            val style = if (highlight) ChatFormatting.GOLD else ChatFormatting.AQUA
+                            // Pad each cell to fixed width so subsequent columns line up
+                            val cell = "  $text"
+                            val padSpaces = (colWidths[ci] - cell.length).coerceAtLeast(0)
+                            lineComp = lineComp
+                                .append(Component.literal(cell).mccFont().withStyle(style))
+                                .append(Component.literal(" ".repeat(padSpaces)).mccFont())
+
+                            // Build tooltip details per size for uncaught fish with specific odds
+                            if (highlight) {
+                                val baseCellMass = (pFish / 100.0) * wPct * sPct
+                                if (baseCellMass > 0.0) {
+                                    val groupAll = candidates.filter { rec -> isAllowedNow(rec.catchTime) }
+                                    val totalElu = groupAll.count { it.elusive }
+                                    val totalNon = groupAll.size - totalElu
+                                    val pElu = (pElusiveBase / 100.0)
+                                    val uncaughtNow = groupAll.filter { rec -> !rec.caughtWeights.any { w -> w.equals(s, true) } }
+                                    if (uncaughtNow.isNotEmpty()) {
+                                        val section = Component.literal("")
+                                        if (tooltipSections.isNotEmpty()) section.append(Component.literal("\n"))
+                                        section.append(Component.literal("${s} uncaught:").withStyle(ChatFormatting.AQUA))
+                                        uncaughtNow.forEach { rec ->
+                                            val groupCount = if (rec.elusive) totalElu else totalNon
+                                            if (groupCount > 0) {
+                                                val share = if (rec.elusive) baseCellMass * pElu / groupCount else baseCellMass * (1.0 - pElu) / groupCount
+                                                val pct = share * 100.0
+                                                val tags = buildString {
+                                                    val tagList = mutableListOf<String>()
+                                                    if (rec.elusive) tagList.add("Elusive")
+                                                    tagList.add("Catch: ${rec.catchTime.uppercase().replace('_',' ')}")
+                                                    append(tagList.joinToString(", "))
+                                                }
+                                                section.append(Component.literal("\n - ").withStyle(ChatFormatting.GRAY))
+                                                section.append(Component.literal(rec.fishName).withStyle(ChatFormatting.GOLD))
+                                                section.append(Component.literal(" (${tags}) — ").withStyle(ChatFormatting.DARK_GRAY))
+                                                section.append(Component.literal("${"""%.4f""".format(pct)}% ").withStyle(ChatFormatting.AQUA))
+                                            }
+                                        }
+                                        tooltipSections.add(section)
+                                    }
+                                }
+                            }
                         }
-                        StringWidget(lineComp, font).at(row++, 0, settings = LayoutConstants.LEFT).alignLeft()
+                        val rowWidget = StringWidget(lineComp, font)
+                        rowWidget.at(row++, 0, settings = LayoutConstants.LEFT).alignLeft()
+                        if (tooltipSections.isNotEmpty()) {
+                            val combined = Component.literal("")
+                            tooltipSections.forEach { combined.append(it) }
+                            val tip = Tooltip.create(combined)
+                            rowWidget.setTooltip(tip)
+                        }
                     }
                 }
 
@@ -387,20 +542,51 @@ class SpotDialog(x: Int, y: Int, key: String) : TridentDialog(x, y, key), Themed
                 fun renderOneDimTable(title: String, labels: List<String>, dist: List<Pair<String, Double>>, pType: Double, colorFor: (String) -> Int) {
                     StringWidget(Component.literal(title).mccFont().withStyle(ChatFormatting.GRAY), font)
                         .at(row++, 0, settings = LayoutConstants.LEFT)
-                    var headerComp = Component.literal(" ").mccFont()
+
+                    val map = dist.associate { it.first to it.second }
+
+                    // Compute per-column widths from actual rendered text in current mode
+                    val headerPad = 0 // minimal spaces before header letter
+                    val headerInterColumnPadding = 2 // manual center offset (can be negative/positive)
+                    val valuePadFirst = 0 // no padding before first value
+                    val valuePadOther = 2 // two spaces before other values
+                    val colWidths: List<Int> = labels.mapIndexed { idx, l ->
+                        val pct = (map[l] ?: 0.0) / 100.0
+                        val value = if (showAbsolutePercent) (pType) * pct else catchesLeft * (pType/100.0) * pct
+                        val text = if (showAbsolutePercent) "${"""%.2f""".format(value)}%" else "${"""%.2f""".format(value)}"
+                        val valuePad = if (idx == 0) valuePadFirst else valuePadOther
+                        // Column width must fit either header (letter only) or value cell
+                        kotlin.math.max(headerPad + 1, valuePad + text.length)
+                    }
+
+                    // Build header with letters left-aligned to each column start
+                    var headerComp = Component.literal("").mccFont()
                     labels.forEachIndexed { idx, l ->
                         val letter = l.first().uppercase()
-                        headerComp = headerComp.append(
-                            Component.literal(if (idx == 0) letter else "     $letter").mccFont().withColor(colorFor(l))
-                        )
+                        val width = colWidths[idx]
+                        val baseCenter = (width - 1) / 2
+                        val offset = if (idx == 0) 0 else headerInterColumnPadding
+                        val leftPad = (baseCenter + offset).coerceAtLeast(headerPad).coerceAtMost(width - 1)
+                        val cell = " ".repeat(leftPad) + letter
+                        val rem = (width - cell.length).coerceAtLeast(0)
+                        headerComp = headerComp
+                            .append(Component.literal(cell).mccFont().withColor(colorFor(l)))
+                            .append(Component.literal(" ".repeat(rem)).mccFont())
                     }
                     StringWidget(headerComp, font).at(row++, 0, settings = LayoutConstants.LEFT).alignLeft()
-                    val map = dist.associate { it.first to it.second }
+
+                    // Build aligned values row
                     var valuesComp = Component.literal("").mccFont()
-                    labels.forEach { l ->
+                    labels.forEachIndexed { idx, l ->
                         val pct = (map[l] ?: 0.0) / 100.0
-                        val exp = catchesLeft * (pType/100.0) * pct
-                        valuesComp = valuesComp.append(Component.literal(if (valuesComp.string.isEmpty()) "${"""%.2f""".format(exp)}" else "  ${"""%.2f""".format(exp)}").mccFont().withStyle(ChatFormatting.AQUA))
+                        val value = if (showAbsolutePercent) (pType) * pct else catchesLeft * (pType/100.0) * pct
+                        val text = if (showAbsolutePercent) "${"""%.2f""".format(value)}%" else "${"""%.2f""".format(value)}"
+                        val pad = if (idx == 0) valuePadFirst else valuePadOther
+                        val cell = " ".repeat(pad) + text
+                        val padSpaces = (colWidths[idx] - cell.length).coerceAtLeast(0)
+                        valuesComp = valuesComp
+                            .append(Component.literal(cell).mccFont().withStyle(ChatFormatting.AQUA))
+                            .append(Component.literal(" ".repeat(padSpaces)).mccFont())
                     }
                     StringWidget(valuesComp, font).at(row++, 0, settings = LayoutConstants.LEFT).alignLeft()
                 }

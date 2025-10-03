@@ -3,8 +3,11 @@ package cc.pe3epwithyou.trident.client.listeners
 import cc.pe3epwithyou.trident.client.TridentClient
 import cc.pe3epwithyou.trident.config.Config
 import cc.pe3epwithyou.trident.feature.fishing.DepletedDisplay
+import cc.pe3epwithyou.trident.feature.fishing.FishCollectionService
 import cc.pe3epwithyou.trident.interfaces.DialogCollection
+import cc.pe3epwithyou.trident.interfaces.meter.MeterCalculator
 import cc.pe3epwithyou.trident.state.MCCIState
+import cc.pe3epwithyou.trident.state.PlayerStateIO
 import cc.pe3epwithyou.trident.utils.Resources
 import cc.pe3epwithyou.trident.utils.extensions.WindowExtensions.focusWindowIfInactive
 import cc.pe3epwithyou.trident.utils.extensions.WindowExtensions.requestAttentionIfInactive
@@ -39,6 +42,7 @@ object ChatEventListener {
     private fun Component.isCaughtMessage() = Regex("^\\(.\\) You caught: \\[.+].*").matches(this.string)
     private fun Component.isIconMessage() = Regex("^\\s*. (Triggered|Special): .+").matches(this.string)
     private fun Component.isXPMessage() = Regex("^\\s*. You earned: .+").matches(this.string)
+    private fun Component.isMinigameXPMessage() = Regex("^\\s*. You receive: .+Island XP.*", RegexOption.IGNORE_CASE).matches(this.string)
     private fun Component.isReceivedItem() = Regex("^\\(.\\) You receive: .+").matches(this.string)
     private fun Component.isDepletedSpot() =
         Regex("^\\[.] This spot is Depleted, so you can no longer fish here\\.").matches(this.string)
@@ -112,6 +116,8 @@ object ChatEventListener {
                 triggerBait = !checkJunk(message)
                 lastCaughtMessage = message
                 lastSpecial = false
+                // Additively record fish from hover menu immediately to keep local collection fresh
+                FishCollectionService.noteCatchFromChatHover(message)
             }
 
             if (message.isIconMessage()) {
@@ -132,12 +138,13 @@ object ChatEventListener {
                     ps.dailyMeter.sessionXpGained += earned
                     ps.weeklyMeter.sessionXpGained += earned
                     if (ps.dailyMeter.progressTarget > 0) {
-                        cc.pe3epwithyou.trident.interfaces.meter.MeterCalculator.applyXpToDaily(earned.toInt())
+                        MeterCalculator.applyXpToDaily(earned.toInt())
                     }
                     if (ps.weeklyMeter.progressTarget > 0) {
-                        cc.pe3epwithyou.trident.interfaces.meter.MeterCalculator.applyXpToWeekly(earned.toInt())
+                        MeterCalculator.applyXpToWeekly(earned.toInt())
                     }
                     DialogCollection.refreshDialog("meter")
+                    PlayerStateIO.save()
                 }
 
                 if (isSupplyPreserve) {
@@ -167,7 +174,7 @@ object ChatEventListener {
                 val isJunk = if (caughtMsg != null) checkJunk(caughtMsg) else false
                 val caughtFish = caughtText.isNotEmpty() && !caughtSpirit && !caughtTreasure && !caughtPearl && !isJunk
                 val caughtElusive = lastSpecial
-                ChatUtils.debugLog(
+                /*ChatUtils.debugLog(
                     (
                         """
                         Fishing catch parse:
@@ -182,7 +189,7 @@ object ChatEventListener {
                         - ElusiveFish: $caughtElusive
                         """
                         ).trimIndent()
-                )
+                )*/
                 augments.forEach { a ->
                     if (a.paused) return@forEach
                     val cond = a.useCondition
@@ -210,6 +217,25 @@ object ChatEventListener {
                 lastCaughtMessage = null
                 lastSpecial = false
                 DialogCollection.refreshDialog("supplies")
+            }
+
+            // Minigames: end-of-game XP message "You receive: xxx Island XP"
+            if (message.isMinigameXPMessage()) {
+                val m = Regex("(?i)You receive:\\s*([0-9,]+)\\s*Island XP").find(message.string)
+                val earned = m?.groupValues?.get(1)?.replace(",", "")?.toLongOrNull() ?: 0L
+                if (earned > 0) {
+                    val ps = TridentClient.playerState
+                    ps.dailyMeter.sessionXpGained += earned
+                    ps.weeklyMeter.sessionXpGained += earned
+                    if (ps.dailyMeter.progressTarget > 0) {
+                        MeterCalculator.applyXpToDaily(earned.toInt())
+                    }
+                    if (ps.weeklyMeter.progressTarget > 0) {
+                        MeterCalculator.applyXpToWeekly(earned.toInt())
+                    }
+                    DialogCollection.refreshDialog("meter")
+                    PlayerStateIO.save()
+                }
             }
 
             true

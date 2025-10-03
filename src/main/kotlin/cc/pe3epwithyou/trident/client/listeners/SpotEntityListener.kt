@@ -40,7 +40,7 @@ object SpotEntityListener : ClientTickEvents.EndTick {
             lastDebugLogGameTime = level.gameTime
             val hookStr = parsed.hookPercents.entries.joinToString(", ") { "${it.key.name}:${"""%.2f""".format(it.value)}%" }
             val magStr = parsed.magnetPercents.entries.joinToString(", ") { "${it.key.name}:${"""%.2f""".format(it.value)}%" }
-            ChatUtils.debugLog(
+            /*ChatUtils.debugLog(
                 """
                 Spot Text:\n${text}
                 Parsed Spot Bonuses:
@@ -51,7 +51,7 @@ object SpotEntityListener : ClientTickEvents.EndTick {
                 Treasure:+${"""%.2f""".format(parsed.treasureChanceBonusPercent)}%  Spirit:+${"""%.2f""".format(parsed.spiritChanceBonusPercent)}%
                 Wayfinder:+${"""%.2f""".format(parsed.wayfinderDataBonus)}
                 """.trimIndent()
-            )
+            )*/
         }
 
         val st = TridentClient.playerState.spot
@@ -98,6 +98,7 @@ object SpotEntityListener : ClientTickEvents.EndTick {
         DialogCollection.refreshDialog("magnetchances")
         DialogCollection.refreshDialog("chanceperks")
         DialogCollection.refreshDialog("spot")
+        DialogCollection.refreshDialog("fishcollection")
     }
 
     fun findDisplay(fishingHook: FishingHook?): Display.TextDisplay? {
@@ -150,6 +151,7 @@ object SpotEntityListener : ClientTickEvents.EndTick {
         DialogCollection.refreshDialog("magnetchances")
         DialogCollection.refreshDialog("chanceperks")
         DialogCollection.refreshDialog("spot")
+        DialogCollection.refreshDialog("fishcollection")
     }
 }
 

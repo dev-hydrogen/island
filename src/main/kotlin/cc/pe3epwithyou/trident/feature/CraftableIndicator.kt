@@ -13,9 +13,10 @@ object CraftableIndicator {
         val slotName = slot.item.hoverName.string
         if ("Blueprint: " !in slotName) return
         val lore = slot.item.getLore()
-        val lastLine = lore.last().string
-        if ("Click to Assemble" !in lastLine) return
-        if ("(Missing materials)" !in lastLine) return
+        val hasAssemble = lore.any { it.string.contains("Click to Assemble") }
+        val hasMissingMaterials = lore.any { it.string.contains("(Missing materials)") }
+        if (!hasAssemble) return
+        if (!hasMissingMaterials) return
         Texture(
             Resources.trident("textures/interface/no_materials.png"),
             6,

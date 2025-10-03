@@ -160,6 +160,43 @@ object ItemParser {
         return lore.any { it.contains("paused:") }
     }
 
+    data class AugmentRepairInfo(
+        val repairedBefore: Boolean = false,
+        val broken: Boolean = false,
+        val repairCost: Int? = null,
+    )
+
+    fun parseAugmentRepairInfo(item: ItemStack): AugmentRepairInfo {
+        val loreRaw = item.getLore().map { it.string }
+        var repairedBefore = false
+        var broken = false
+        var repairCost: Int? = null
+
+        val repairedLineMatch = loreRaw.any { it.contains("This item has previously been repaired.", ignoreCase = true) }
+        if (repairedLineMatch) repairedBefore = true
+
+        val brokenLineMatch = loreRaw.any { it.contains("This item is out of uses!", ignoreCase = true) }
+        if (brokenLineMatch) broken = true
+
+        // Example: "Repair Cost: 12,345/67,890"
+        val repairRegex = Regex("(?i)Repair\\s*Cost:\\s*([0-9,]+)\\s*/\\s*([0-9,]+)")
+        loreRaw.forEach { line ->
+            val m = repairRegex.find(line)
+            if (m != null) {
+                val costStr = m.groupValues[2].replace(",", "")
+                repairCost = costStr.toIntOrNull()
+                return@forEach
+            }
+        }
+
+        // If broken and no explicit repair cost, infer it was already repaired (cannot repair again)
+        if (broken && repairCost == null) {
+            repairedBefore = true
+        }
+
+        return AugmentRepairInfo(repairedBefore, broken, repairCost)
+    }
+
     data class SpotBonuses(
         val hookPercents: MutableMap<UpgradeLine, Double> = mutableMapOf(),
         val magnetPercents: MutableMap<UpgradeLine, Double> = mutableMapOf(),

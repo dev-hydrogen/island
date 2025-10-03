@@ -7,6 +7,7 @@ import cc.pe3epwithyou.trident.feature.questing.QuestStorage
 import cc.pe3epwithyou.trident.feature.questing.QuestingParser
 import cc.pe3epwithyou.trident.interfaces.DialogCollection
 import cc.pe3epwithyou.trident.interfaces.questing.QuestingDialog
+import cc.pe3epwithyou.trident.state.MCCIState
 import cc.pe3epwithyou.trident.state.Rarity
 import cc.pe3epwithyou.trident.state.fishing.Augment
 import cc.pe3epwithyou.trident.state.MutableAugment
@@ -34,6 +35,7 @@ object ChestScreenListener {
     }
 
     private fun handleScreen(screen: ContainerScreen) {
+        if (!MCCIState.isOnIsland()) return
         if ("FISHING SUPPLIES" in screen.title.string) {
             DelayedAction.delayTicks(2L) {
                 findAugments(screen)
@@ -106,6 +108,20 @@ object ChestScreenListener {
         return Pair(cur, max)
     }
 
+    private fun parseResetMillisFrom(line: String, label: String): Long? {
+        // Accept variations like "Resets in:" or "Rests in:" or "Claimable in:"
+        val norm = line.lowercase()
+        if (!norm.contains(label.lowercase())) return null
+        // Extract segments like 2d 3h 4m 5s (any subset, any order typical d h m, or just s)
+        fun grab(regex: Regex): Long = regex.find(norm)?.groupValues?.get(1)?.toLongOrNull() ?: 0L
+        val days = grab(Regex("(\\d+)d"))
+        val hours = grab(Regex("(\\d+)h"))
+        val mins = grab(Regex("(\\d+)m"))
+        val secs = grab(Regex("(\\d+)s"))
+        val totalMs = days * 86_400_000L + hours * 3_600_000L + mins * 60_000L + secs * 1_000L
+        return if (totalMs <= 0L) null else (System.currentTimeMillis() + totalMs)
+    }
+
     fun findMeters(screen: ContainerScreen) {
         if ("ISLAND REWARDS" !in screen.title.string) return
         val slots = screen.menu.slots
@@ -116,27 +132,41 @@ object ChestScreenListener {
             val lore = slot.item.getLore().map { it.string }
             when {
                 name.contains("Daily Meter", ignoreCase = true) -> {
+                    val st = TridentClient.playerState.dailyMeter
                     lore.forEach { line ->
                         parseMeterProgress(line)?.let { (cur, max) ->
-                            TridentClient.playerState.dailyMeter.progressCurrent = cur
-                            TridentClient.playerState.dailyMeter.progressTarget = max
+                            // Only additive for progress current; target follows menu
+                            // Do not count full bar (cur == max) as progress as that implies unclaimed reward
+                            // Target should NOT follow the menu; derive from current claims to avoid desync
+                            st.progressTarget = cc.pe3epwithyou.trident.interfaces.meter.MeterCalculator.nextDailyTargetFromClaims(
+                                st.claimsCurrent,
+                                st.claimsMax
+                            )
+                            if (cur > st.progressCurrent && cur < max) st.progressCurrent = cur
                         }
                         parseMeterClaims(line, "Daily Claims")?.let { (cur, max) ->
-                            TridentClient.playerState.dailyMeter.claimsCurrent = cur
-                            TridentClient.playerState.dailyMeter.claimsMax = max
+                            if (cur > st.claimsCurrent) st.claimsCurrent = cur
+                            if (max > st.claimsMax) st.claimsMax = max
                         }
+                        // Resets in: xxh xxm or xxs
+                        parseResetMillisFrom(line, "Resets in:")?.let { ts -> st.nextResetAtMs = ts }
                     }
                 }
                 name.contains("Weekly Vault", ignoreCase = true) -> {
+                    val st = TridentClient.playerState.weeklyMeter
                     lore.forEach { line ->
                         parseMeterProgress(line)?.let { (cur, max) ->
-                            TridentClient.playerState.weeklyMeter.progressCurrent = cur
-                            TridentClient.playerState.weeklyMeter.progressTarget = max
+                            // Always read from menu for weekly vault
+                            st.progressCurrent = cur
+                            st.progressTarget = max
                         }
                         parseMeterClaims(line, "Stored Rewards")?.let { (cur, max) ->
-                            TridentClient.playerState.weeklyMeter.claimsCurrent = cur
-                            TridentClient.playerState.weeklyMeter.claimsMax = max
+                            st.claimsCurrent = cur
+                            st.claimsMax = max
                         }
+                        // Weekly may show days: Claimable in: xxd xxh xxm (or Resets in)
+                        parseResetMillisFrom(line, "Resets in:")?.let { ts -> st.nextResetAtMs = ts }
+                        parseResetMillisFrom(line, "Claimable in:")?.let { ts -> st.nextResetAtMs = ts }
                     }
                 }
             }
@@ -224,6 +254,7 @@ object ChestScreenListener {
         )
         TridentClient.playerState.supplies.augmentsAvailable = availableSlots
         // Parse uses for each augment; keep length aligned with augments list, skip locked/empty
+        val previousAugmentsByType = TridentClient.playerState.supplies.augments.associateBy { it.augment }
         val mutableAugments = mutableListOf<MutableAugment>()
         augmentItems.forEachIndexed { idx, item ->
             val name = item.displayName.string
@@ -231,17 +262,27 @@ object ChestScreenListener {
                 // skip placeholders in new structure
             } else {
                 val parsed = ItemParser.getAugmentUses(item)
+                val repair = ItemParser.parseAugmentRepairInfo(item)
                 val augment = parsedAugments.getOrNull(idx)
                 if (augment != null) {
                     val meta = ItemParser.getAugmentUseCondition(item)
                     val paused = ItemParser.isAugmentPaused(item)
+                    val prev = previousAugmentsByType[augment]
+                    val resolvedMax = parsed?.second ?: prev?.usesMax
+                    val resolvedCur = when {
+                        repair.broken -> 0
+                        else -> parsed?.first ?: prev?.usesCurrent
+                    }
                     val mutable = MutableAugment(
                         augment = augment,
-                        usesCurrent = parsed?.first,
-                        usesMax = parsed?.second,
+                        usesCurrent = resolvedCur,
+                        usesMax = resolvedMax,
                         useCondition = meta.condition,
                         paused = paused,
-                        bannedInGrotto = meta.bannedInGrotto
+                        bannedInGrotto = meta.bannedInGrotto,
+                        repairedBefore = repair.repairedBefore,
+                        broken = repair.broken,
+                        repairCost = repair.repairCost
                     )
                     mutableAugments.add(mutable)
                 }

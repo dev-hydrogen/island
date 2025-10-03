@@ -9,6 +9,7 @@ import cc.pe3epwithyou.trident.feature.questing.game.HITWHandlers
 import cc.pe3epwithyou.trident.feature.questing.game.RSRHandlers
 import cc.pe3epwithyou.trident.feature.questing.game.SkyBattleHandlers
 import cc.pe3epwithyou.trident.interfaces.DialogCollection
+import cc.pe3epwithyou.trident.interfaces.meter.MeterDialog
 import cc.pe3epwithyou.trident.interfaces.fishing.SuppliesDialog
 import cc.pe3epwithyou.trident.interfaces.fishing.SpotDialog
 import cc.pe3epwithyou.trident.interfaces.fishing.UpgradesDialog
@@ -18,6 +19,8 @@ import cc.pe3epwithyou.trident.interfaces.fishing.MagnetChanceDialog
 import cc.pe3epwithyou.trident.interfaces.fishing.RodChanceDialog
 import cc.pe3epwithyou.trident.interfaces.fishing.PotChanceDialog
 import cc.pe3epwithyou.trident.interfaces.fishing.ChancePerksDialog
+import cc.pe3epwithyou.trident.interfaces.fishing.FishDialog
+import cc.pe3epwithyou.trident.interfaces.UtilitiesDialog
 import cc.pe3epwithyou.trident.interfaces.killfeed.KillFeedDialog
 import cc.pe3epwithyou.trident.interfaces.questing.QuestingDialog
 import cc.pe3epwithyou.trident.state.ClimateType
@@ -86,7 +89,11 @@ object NoxesiumUtils {
         }
         if (currentGame == Game.FISHING && Config.Fishing.potChancesModule) {
             val k = "potchances"
-            DialogCollection.open(k, PotChanceDialog(10, 30, k))
+            //DialogCollection.open(k, PotChanceDialog(10, 30, k))
+        }
+        if (currentGame == Game.FISHING) {
+            val k = "fishcollection"
+           // DialogCollection.open(k, FishDialog(10, 30, k))
         }
         if (currentGame == Game.FISHING && Config.Fishing.chancePerksModule) {
             val k = "chanceperks"
@@ -114,11 +121,19 @@ object NoxesiumUtils {
             QuestingDialog.currentGame = Game.entries.filter { g -> g.server == game }.getOrNull(0) ?: return
             DialogCollection.open(k, QuestingDialog(10, 10, k))
         }
-        // Ensure meter dialog is present in HUB
-        if (currentGame == Game.HUB || currentGame == Game.FISHING) {
+        // Show meter dialog based on config
+        if (Config.MetersConfig.enabled) {
             val k = "meter"
             if (DialogCollection.get(k) == null) {
-                DialogCollection.open(k, cc.pe3epwithyou.trident.interfaces.meter.MeterDialog(10, 60, k))
+                DialogCollection.open(k, MeterDialog(10, 60, k))
+            }
+        }
+        if (currentGame == Game.HUB || currentGame == Game.FISHING) {
+            val k = "utilities"
+            if (DialogCollection.get(k) == null) {
+                DialogCollection.open(k, UtilitiesDialog(10, 10, k))
+            } else {
+                DialogCollection.refreshDialog(k)
             }
         }
     }

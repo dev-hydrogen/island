@@ -119,6 +119,24 @@ object MeterCalculator {
             else -> 12000
         }
     }
+
+    // Public helpers: compute next target from current claims without relying on menu progress
+    fun nextDailyTargetFromClaims(claimsCurrent: Int, claimsMax: Int): Int {
+        // If at max claims (non-zero cap and reached), keep current tier target to show full bar
+        return if (claimsMax != 0 && claimsCurrent >= claimsMax) {
+            dailyTargetFor(claimsCurrent)
+        } else {
+            dailyTargetFor((claimsCurrent + 1).coerceAtLeast(1))
+        }
+    }
+
+    fun nextWeeklyTargetFromClaims(claimsCurrent: Int, claimsMax: Int): Int {
+        return if (claimsMax != 0 && claimsCurrent >= claimsMax) {
+            weeklyTargetFor(claimsCurrent)
+        } else {
+            weeklyTargetFor((claimsCurrent + 1).coerceAtLeast(1))
+        }
+    }
 }
 
 

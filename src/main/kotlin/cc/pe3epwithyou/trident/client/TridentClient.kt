@@ -4,8 +4,11 @@ import cc.pe3epwithyou.trident.client.events.QuestingEvents
 import cc.pe3epwithyou.trident.client.listeners.ChatEventListener
 import cc.pe3epwithyou.trident.client.listeners.ChestScreenListener
 import cc.pe3epwithyou.trident.client.listeners.SpotEntityListener
+import cc.pe3epwithyou.trident.client.listeners.TooltipExchangeListener
 import cc.pe3epwithyou.trident.client.listeners.KillChatListener
 import cc.pe3epwithyou.trident.client.listeners.TideWindBossbarListener
+import cc.pe3epwithyou.trident.client.listeners.MeterResetListener
+import cc.pe3epwithyou.trident.client.listeners.UtilitiesRefreshListener
 import cc.pe3epwithyou.trident.config.Config
 import cc.pe3epwithyou.trident.feature.fishing.DepletedDisplay
 import cc.pe3epwithyou.trident.feature.fishing.SuppliesModuleTimer
@@ -13,6 +16,7 @@ import cc.pe3epwithyou.trident.feature.questing.QuestListener
 import cc.pe3epwithyou.trident.feature.questing.QuestStorage
 import cc.pe3epwithyou.trident.interfaces.DialogCollection
 import cc.pe3epwithyou.trident.interfaces.fishing.SuppliesDialog
+import cc.pe3epwithyou.trident.interfaces.UtilitiesDialog
 import cc.pe3epwithyou.trident.interfaces.questing.QuestingDialog
 import cc.pe3epwithyou.trident.interfaces.fishing.UpgradesDialog
 import cc.pe3epwithyou.trident.interfaces.fishing.ChanceDialog
@@ -22,6 +26,9 @@ import cc.pe3epwithyou.trident.interfaces.fishing.RodChanceDialog
 import cc.pe3epwithyou.trident.interfaces.fishing.PotChanceDialog
 import cc.pe3epwithyou.trident.interfaces.fishing.ChancePerksDialog
 import cc.pe3epwithyou.trident.interfaces.fishing.SpotDialog
+import cc.pe3epwithyou.trident.interfaces.fishing.FishDialog
+import cc.pe3epwithyou.trident.net.McciApi
+import cc.pe3epwithyou.trident.feature.fishing.FishCollectionService
 import cc.pe3epwithyou.trident.state.MCCIState
 import cc.pe3epwithyou.trident.state.PlayerState
 import cc.pe3epwithyou.trident.state.PlayerStateIO
@@ -49,6 +56,7 @@ class TridentClient : ClientModInitializer {
 
     private val debugDialogs = mapOf(
         "supplies" to ::SuppliesDialog,
+        "utilities" to ::UtilitiesDialog,
         "questing" to ::QuestingDialog,
         "upgrades" to ::UpgradesDialog,
         "chances" to ::ChanceDialog,
@@ -57,6 +65,7 @@ class TridentClient : ClientModInitializer {
         "rodchances" to ::RodChanceDialog,
         "potchances" to ::PotChanceDialog,
         "chanceperks" to ::ChancePerksDialog,
+        //"fishcollection" to ::FishDialog,
         "spot" to ::SpotDialog,
     )
 
@@ -67,7 +76,7 @@ class TridentClient : ClientModInitializer {
     }
 
     private val debugCommands: LiteralArgumentBuilder<FabricClientCommandSource> =
-        ClientCommandManager.literal("trident")
+        ClientCommandManager.literal("islandplusplus")
             .then(
                 ClientCommandManager.literal("open").then(
                     ClientCommandManager.argument("dialog", StringArgumentType.string())
@@ -106,6 +115,15 @@ class TridentClient : ClientModInitializer {
                             0
                         }
                 )).then(
+                ClientCommandManager.literal("fish").then(
+                    ClientCommandManager.literal("reset")
+                        .executes { _ ->
+                            FishCollectionService.resetCollection()
+                            ChatUtils.sendMessage(Component.literal("Fish collection reset").withStyle(ChatFormatting.AQUA))
+                            0
+                        }
+                )
+            ).then(
                 ClientCommandManager.literal("resetDialogPositions")
                     .executes { _ ->
                         DialogCollection.resetDialogPositions()
@@ -191,10 +209,13 @@ class TridentClient : ClientModInitializer {
         SpotEntityListener.register()
         DepletedDisplay.DepletedTimer.register()
         TideWindBossbarListener.register()
+        MeterResetListener.register()
         SuppliesModuleTimer.register()
         KillChatListener.register()
+        UtilitiesRefreshListener.register()
         DelayedAction.init()
         QuestListener.register()
+        TooltipExchangeListener.register()
 
 //        Register keybinding
         ClientTickEvents.END_CLIENT_TICK.register(ClientTickEvents.EndTick { client: Minecraft ->

@@ -29,10 +29,23 @@ class AugmentStackWidget(width: Int, height: Int, entries: List<MutableAugment>)
             for (i in 0 until topCount) {
                 val augment = entries[i]
                 val model = Model(augment.augment.texturePath, width, height)
-                val label: Component? = if (augment.usesCurrent != null && augment.usesMax != null) {
-                    Component.literal("${augment.usesCurrent}/${augment.usesMax}").mccFont()
+                val label: Component? = if (augment.usesMax != null) {
+                    val cur = augment.usesCurrent ?: 0
+                    Component.literal("${cur}/${augment.usesMax}").mccFont()
                 } else null
-                IconWithLabelWidget(model, label, marginRight = 0).at(top = 0, left = x)
+                val overlay = if (augment.repairedBefore) "R" else null
+                val tip = if (augment.repairedBefore) Component.literal("Repaired") else null
+                val overlay2 = if (augment.paused) "P" else null
+                val tip2 = if (augment.paused) Component.literal("Paused") else null
+                IconWithLabelWidget(
+                    model,
+                    label,
+                    marginRight = 0,
+                    overlayLetter = overlay,
+                    overlayTooltip = tip,
+                    overlayLetterSecondary = overlay2,
+                    overlayTooltipSecondary = tip2
+                ).at(top = 0, left = x)
                 x += width + gap
             }
 
@@ -44,10 +57,23 @@ class AugmentStackWidget(width: Int, height: Int, entries: List<MutableAugment>)
                     val idx = topCount + j
                     val augment = entries[idx]
                     val model = Model(augment.augment.texturePath, width, height)
-                    val label: Component? = if (augment.usesCurrent != null && augment.usesMax != null) {
-                        Component.literal("${augment.usesCurrent}/${augment.usesMax}").mccFont()
+                    val label: Component? = if (augment.usesMax != null) {
+                        val cur = augment.usesCurrent ?: 0
+                        Component.literal("${cur}/${augment.usesMax}").mccFont()
                     } else null
-                    IconWithLabelWidget(model, label, marginRight = 0).at(top = y, left = x)
+                    val overlay = if (augment.repairedBefore) "R" else null
+                    val tip = if (augment.repairedBefore) Component.literal("Repaired") else null
+                    val overlay2 = if (augment.paused) "P" else null
+                    val tip2 = if (augment.paused) Component.literal("Paused") else null
+                    IconWithLabelWidget(
+                        model,
+                        label,
+                        marginRight = 0,
+                        overlayLetter = overlay,
+                        overlayTooltip = tip,
+                        overlayLetterSecondary = overlay2,
+                        overlayTooltipSecondary = tip2
+                    ).at(top = y, left = x)
                     x += width + gap
                 }
             }

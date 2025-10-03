@@ -7,6 +7,7 @@ import cc.pe3epwithyou.trident.interfaces.themes.TridentThemes
 import cc.pe3epwithyou.trident.utils.ChatUtils
 import cc.pe3epwithyou.trident.utils.Resources
 import dev.isxander.yacl3.api.OptionDescription
+import dev.isxander.yacl3.api.controller.StringControllerBuilder
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler
 import dev.isxander.yacl3.config.v2.api.SerialEntry
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder
@@ -83,7 +84,25 @@ class Config {
     @SerialEntry
     var gamesAutoFocus: Boolean = false
 
+    // Island Exchange config
+    @SerialEntry
+    var exchangeAutoRefresh: Boolean = false
+    @SerialEntry
+    var exchangeAutoRefreshMinutes: Int = 10
+    @SerialEntry
+    var exchangeIgnoreAmountAboveOne: Boolean = false
+    @SerialEntry
+    var exchangeTooltipEnabled: Boolean = true
+
+    // API config
+    @SerialEntry
+    var apiKey: String = ""
+    @SerialEntry
+    var apiUserAgent: String = "Islandplusplus/1.0"
+
     // Meters config
+    @SerialEntry
+    var metersEnabled: Boolean = true
     @SerialEntry
     var metersShortWindowMinutes: Int = 10
     @SerialEntry
@@ -193,7 +212,27 @@ class Config {
             get() = handler.instance().gamesAutoFocus
     }
 
+    object Exchange {
+        val autoRefresh: Boolean
+            get() = handler.instance().exchangeAutoRefresh
+        val autoRefreshMinutes: Int
+            get() = handler.instance().exchangeAutoRefreshMinutes
+        val ignoreAmountAboveOne: Boolean
+            get() = handler.instance().exchangeIgnoreAmountAboveOne
+        val tooltipEnabled: Boolean
+            get() = handler.instance().exchangeTooltipEnabled
+    }
+
+    object Api {
+        val apiKey: String
+            get() = handler.instance().apiKey
+        val userAgent: String
+            get() = handler.instance().apiUserAgent
+    }
+
     object MetersConfig {
+        val enabled: Boolean
+            get() = handler.instance().metersEnabled
         val shortWindowMinutes: Int
             get() = handler.instance().metersShortWindowMinutes
         val shortHalfLifeMinutes: Int
@@ -240,9 +279,9 @@ class Config {
 
     companion object {
         val handler: ConfigClassHandler<Config> by lazy {
-            ConfigClassHandler.createBuilder(Config::class.java).id(Resources.trident("config")).serializer { config ->
+            ConfigClassHandler.createBuilder(Config::class.java).id(Resources.islandplusplus("config")).serializer { config ->
                 GsonConfigSerializerBuilder.create(config)
-                    .setPath(FabricLoader.getInstance().configDir.resolve("trident.json")).build()
+                    .setPath(FabricLoader.getInstance().configDir.resolve("islandplusplus.json")).build()
             }.build()
         }
 
@@ -362,9 +401,68 @@ class Config {
                     }
                 }
 
+                groups.register("api") {
+                    name(Component.translatable("config.trident.api.name"))
+                    description(OptionDescription.of(Component.translatable("config.trident.api.description")))
+
+                    options.register<String>("api_key") {
+                        name(Component.translatable("config.trident.api.key.name"))
+                        description(OptionDescription.of(Component.translatable("config.trident.api.key.description")))
+                        binding(handler.instance()::apiKey, "")
+                        controller(StringControllerBuilder::create)
+                    }
+
+                    options.register<String>("api_user_agent") {
+                        name(Component.translatable("config.trident.api.user_agent.name"))
+                        description(OptionDescription.of(Component.translatable("config.trident.api.user_agent.description")))
+                        binding(handler.instance()::apiUserAgent, "Trident/1.0 (contact@example.com)")
+                        controller(StringControllerBuilder::create)
+                    }
+                }
+
+                groups.register("exchange") {
+                    name(Component.translatable("config.trident.exchange.name"))
+                    description(OptionDescription.of(Component.translatable("config.trident.exchange.description")))
+
+                    options.register<Boolean>("exchange_auto_refresh") {
+                        name(Component.translatable("config.trident.exchange.auto_refresh.name"))
+                        description(OptionDescription.of(Component.translatable("config.trident.exchange.auto_refresh.description")))
+                        binding(handler.instance()::exchangeAutoRefresh, false)
+                        controller(tickBox())
+                    }
+
+                    options.register<Int>("exchange_auto_refresh_minutes") {
+                        name(Component.translatable("config.trident.exchange.auto_refresh_minutes.name"))
+                        description(OptionDescription.of(Component.translatable("config.trident.exchange.auto_refresh_minutes.description")))
+                        binding(handler.instance()::exchangeAutoRefreshMinutes, 10)
+                        controller(slider(IntRange(1, 120), 1))
+                    }
+
+                    options.register<Boolean>("exchange_ignore_amount_above_one") {
+                        name(Component.translatable("config.trident.exchange.ignore_amount_above_one.name"))
+                        description(OptionDescription.of(Component.translatable("config.trident.exchange.ignore_amount_above_one.description")))
+                        binding(handler.instance()::exchangeIgnoreAmountAboveOne, false)
+                        controller(tickBox())
+                    }
+
+                    options.register<Boolean>("exchange_tooltip_enabled") {
+                        name(Component.translatable("config.trident.exchange.tooltip_enabled.name"))
+                        description(OptionDescription.of(Component.translatable("config.trident.exchange.tooltip_enabled.description")))
+                        binding(handler.instance()::exchangeTooltipEnabled, true)
+                        controller(tickBox())
+                    }
+                }
+
                 groups.register("meters") {
                     name(Component.translatable("config.trident.meters.name"))
                     description(OptionDescription.of(Component.translatable("config.trident.meters.description")))
+
+                    options.register<Boolean>("meters_enabled") {
+                        name(Component.translatable("config.trident.meters.enabled.name"))
+                        description(OptionDescription.of(Component.translatable("config.trident.meters.enabled.description")))
+                        binding(handler.instance()::metersEnabled, true)
+                        controller(tickBox())
+                    }
 
                     options.register<Int>("meters_short_window_minutes") {
                         name(Component.translatable("config.trident.meters.short_window.name"))

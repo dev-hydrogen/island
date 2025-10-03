@@ -53,9 +53,10 @@ class MeterDialog(x: Int, y: Int, key: String) : TridentDialog(x, y, key), Theme
 
         val daily = TridentClient.playerState.dailyMeter
         val weekly = TridentClient.playerState.weeklyMeter
-        val now = System.currentTimeMillis()
-        val hours = ((now - daily.sessionStartMs).coerceAtLeast(1) / 1000.0 / 3600.0)
-        val xpPerHour = if (hours > 0) daily.sessionXpGained / hours else 0.0
+        // Use the mean of short and long EMA as the headline XP/hour to avoid session drift
+        val emaS = daily.emaShortXpPerHour
+        val emaL = daily.emaLongXpPerHour
+        val xpPerHour = if (emaS.isFinite() && emaL.isFinite()) (emaS + emaL) / 2.0 else (if (emaS.isFinite()) emaS else emaL)
 
         StringWidget(Component.literal("DAILY METER").mccFont().withStyle(ChatFormatting.GRAY), font)
             .at(row++, 0, settings = LayoutConstants.LEFT)
@@ -69,7 +70,7 @@ class MeterDialog(x: Int, y: Int, key: String) : TridentDialog(x, y, key), Theme
         StringWidget(Component.literal("  Claims: ${daily.claimsCurrent}/${daily.claimsMax}").mccFont().withStyle(ChatFormatting.AQUA), font)
             .at(row++, 0, settings = LayoutConstants.LEFT)
         run {
-            val xpText = Component.literal("XP/hour: ${String.format("%.0f", xpPerHour)}  (S:${String.format("%.0f", daily.emaShortXpPerHour)} | L:${String.format("%.0f", daily.emaLongXpPerHour)})").mccFont().withStyle(ChatFormatting.AQUA)
+            val xpText = Component.literal("XP/hour: ${String.format("%.0f", xpPerHour)} ").mccFont().withStyle(ChatFormatting.AQUA)
             val xpW = StringWidget(xpText, font)
             xpW.alignLeft()
             xpW.at(row, 0, settings = LayoutConstants.LEFT)

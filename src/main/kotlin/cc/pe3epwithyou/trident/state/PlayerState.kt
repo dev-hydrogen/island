@@ -9,6 +9,7 @@ import cc.pe3epwithyou.trident.state.fishing.PerkStateCalculator
 import cc.pe3epwithyou.trident.state.fishing.PlayerUpgrades
 import cc.pe3epwithyou.trident.state.fishing.SpotState
 import cc.pe3epwithyou.trident.state.fishing.UpgradeLine
+import cc.pe3epwithyou.trident.net.McciApi
 
 import cc.pe3epwithyou.trident.utils.ChatUtils
 import kotlinx.serialization.Serializable
@@ -99,12 +100,18 @@ data class Supplies(
 data class PlayerState(
     var supplies: Supplies = Supplies(),
     var upgrades: PlayerUpgrades = PlayerUpgrades(),
+    var fishCollection: PlayerFishCollection = PlayerFishCollection(),
+    var exchange: ExchangeState = ExchangeState(),
     @Transient var perkState: PerkState = PerkState(),
     @Transient var spot: SpotState = SpotState(),
     @Transient var inGrotto: Boolean = false,
+    @Transient var ingameMinutes: Int = 0,
+    @Transient var isDayTime: Boolean = true,
+    @Transient var currentCollection: String? = null,
     @Transient var tideLines: MutableSet<UpgradeLine> = mutableSetOf(),
     @Transient var windLines: MutableSet<UpgradeLine> = mutableSetOf(),
     @Transient var magnetPylonBonus: Int = 0,
+    @Transient var magnetPylonTimeLeftSeconds: Int = 0,
     @Transient var dailyMeter: MeterState = MeterState(),
     @Transient var weeklyMeter: MeterState = MeterState(),
 )
@@ -117,6 +124,9 @@ data class MutableAugment(
     var useCondition: UseCondition? = null,
     var paused: Boolean = false,
     var bannedInGrotto: Boolean = false,
+    var repairedBefore: Boolean = false,
+    var broken: Boolean = false,
+    var repairCost: Int? = null,
 )
 
 data class MeterState(
@@ -131,13 +141,41 @@ data class MeterState(
     var emaShortXpPerHour: Double = 0.0,
     var emaLongXpPerHour: Double = 0.0,
     var lastEmaUpdateMs: Long = System.currentTimeMillis(),
+    /** Next reset time in epoch millis as parsed from menu. 0 if unknown. */
+    var nextResetAtMs: Long = 0,
+    /** The reset time we last applied so we don't double-reset. 0 if none. */
+    var lastAppliedResetAtMs: Long = 0,
+)
+
+@Serializable
+data class PlayerFishCollection(
+    val records: MutableList<FishRecordState> = mutableListOf()
+)
+
+@Serializable
+data class FishRecordState(
+    val fishName: String,
+    val climate: String,
+    val collection: String,
+    val rarity: Rarity,
+    val catchTime: String = "ALWAYS",
+    val caughtWeights: List<String> = emptyList(),
+    val elusive: Boolean = false
+)
+
+@Serializable
+data class ExchangeState(
+    var activeVersionMs: Long = 0,
+    var soldVersionMs: Long = 0,
+    var activeListings: MutableList<McciApi.IslandExchangeListing> = mutableListOf(),
+    var soldListings: MutableList<McciApi.IslandExchangeListing> = mutableListOf()
 )
 
 object PlayerStateIO {
     // configDir/trident/playerstate.json
     private val path: Path = FabricLoader.getInstance()
         .configDir
-        .resolve("trident")
+        .resolve("islandplusplus")
         .resolve("playerstate.json")
 
     private val json = Json { prettyPrint = true }

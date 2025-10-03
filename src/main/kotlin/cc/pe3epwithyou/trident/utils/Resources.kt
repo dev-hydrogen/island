@@ -4,6 +4,7 @@ import net.minecraft.resources.ResourceLocation
 
 object Resources {
     fun trident(path: String): ResourceLocation = ResourceLocation.fromNamespaceAndPath("trident", path)
+    fun islandplusplus(path: String): ResourceLocation = ResourceLocation.fromNamespaceAndPath("islandplusplus", path)
     fun mcc(path: String): ResourceLocation = ResourceLocation.fromNamespaceAndPath("mcc", path)
     fun minecraft(path: String): ResourceLocation = ResourceLocation.withDefaultNamespace(path)
 }

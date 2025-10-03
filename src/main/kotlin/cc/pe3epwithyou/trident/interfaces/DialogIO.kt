@@ -15,7 +15,7 @@ object DialogIO {
     // configDir/trident/dialog_positions.json
     private val path: Path = FabricLoader.getInstance()
         .configDir
-        .resolve("trident")
+        .resolve("islandplusplus")
         .resolve("dialog_positions.json")
 
     private val json = Json { prettyPrint = true }

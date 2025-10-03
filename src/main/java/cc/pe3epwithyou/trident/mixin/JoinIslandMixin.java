@@ -2,6 +2,7 @@ package cc.pe3epwithyou.trident.mixin;
 
 import cc.pe3epwithyou.trident.modrinth.UpdateChecker;
 import cc.pe3epwithyou.trident.interfaces.DialogCollection;
+import cc.pe3epwithyou.trident.net.IslandExchangeService;
 import net.minecraft.client.multiplayer.ClientHandshakePacketListenerImpl;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.network.protocol.login.ClientboundLoginFinishedPacket;
@@ -24,5 +25,6 @@ public class JoinIslandMixin {
         if (this.serverData == null) return;
         if (!this.serverData.ip.toLowerCase().contains("mccisland.net")) return;
         UpdateChecker.INSTANCE.checkForUpdates();
+        IslandExchangeService.INSTANCE.refreshNow("JoinIslandMixin");
     }
 }
