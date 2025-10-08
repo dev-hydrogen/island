@@ -71,7 +71,7 @@ class SpotDialog(x: Int, y: Int, key: String) : TridentDialog(x, y, key), Themed
             val ps = TridentClient.playerState.perkState
             val winds = TridentClient.playerState.windLines
             val isGrotto = TridentClient.playerState.inGrotto
-            val augmentList = TridentClient.playerState.supplies.augments.filterNot { it.paused }.map { it.augment }
+            val augmentList = TridentClient.playerState.supplies.augments.filter { !it.paused && ((it.usesCurrent ?: 0) > 0) }.map { it.augment }
             val hasElusiveLure = augmentList.any { it == cc.pe3epwithyou.trident.state.fishing.Augment.ELUSIVE_LURE || it == cc.pe3epwithyou.trident.state.fishing.Augment.ELUSIVE_ULTRALURE }
             val pearlLureActive = augmentList.any { it == cc.pe3epwithyou.trident.state.fishing.Augment.PEARL_LURE || it == cc.pe3epwithyou.trident.state.fishing.Augment.PEARL_ULTRALURE }
             val treasureLureActive = augmentList.any { it == cc.pe3epwithyou.trident.state.fishing.Augment.TREASURE_LURE || it == cc.pe3epwithyou.trident.state.fishing.Augment.TREASURE_ULTRALURE }

@@ -42,7 +42,7 @@ object ChatEventListener {
     private fun Component.isCaughtMessage() = Regex("^\\(.\\) You caught: \\[.+].*").matches(this.string)
     private fun Component.isIconMessage() = Regex("^\\s*. (Triggered|Special): .+").matches(this.string)
     private fun Component.isXPMessage() = Regex("^\\s*. You earned: .+").matches(this.string)
-    private fun Component.isMinigameXPMessage() = Regex("^\\s*. You receive: .+Island XP.*", RegexOption.IGNORE_CASE).matches(this.string)
+    private fun Component.isMinigameXPMessage() = Regex("^.*?You receive:\\s*.+?\\s*Island XP.*", RegexOption.IGNORE_CASE).matches(this.string)
     private fun Component.isReceivedItem() = Regex("^\\(.\\) You receive: .+").matches(this.string)
     private fun Component.isDepletedSpot() =
         Regex("^\\[.] This spot is Depleted, so you can no longer fish here\\.").matches(this.string)

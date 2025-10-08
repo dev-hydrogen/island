@@ -135,14 +135,18 @@ object ChestScreenListener {
                     val st = TridentClient.playerState.dailyMeter
                     lore.forEach { line ->
                         parseMeterProgress(line)?.let { (cur, max) ->
-                            // Only additive for progress current; target follows menu
-                            // Do not count full bar (cur == max) as progress as that implies unclaimed reward
-                            // Target should NOT follow the menu; derive from current claims to avoid desync
-                            st.progressTarget = cc.pe3epwithyou.trident.interfaces.meter.MeterCalculator.nextDailyTargetFromClaims(
-                                st.claimsCurrent,
-                                st.claimsMax
-                            )
-                            if (cur > st.progressCurrent && cur < max) st.progressCurrent = cur
+                            if (cur >= max) {
+                                // Full bar implies unclaimed reward; prefer internal state and derive target from claims
+                                st.progressTarget = cc.pe3epwithyou.trident.interfaces.meter.MeterCalculator.nextDailyTargetFromClaims(
+                                    st.claimsCurrent,
+                                    st.claimsMax
+                                )
+                                // Do not update progressCurrent here to avoid desync while rewards are unclaimed
+                            } else {
+                                // Trust the menu values when not full
+                                st.progressCurrent = cur
+                                st.progressTarget = max
+                            }
                         }
                         parseMeterClaims(line, "Daily Claims")?.let { (cur, max) ->
                             if (cur > st.claimsCurrent) st.claimsCurrent = cur
